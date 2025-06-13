@@ -65,8 +65,8 @@ import androidx.compose.ui.text.style.TextOverflow
 import com.yangjy.efficientadb.constant.AdbCommandData
 import com.yangjy.efficientadb.constant.AdbCommands
 import com.yangjy.efficientadb.constant.PlaceHolders
-import com.yangjy.efficientadb.constant.PlaceHolders.SPACE_HOLDER
 import com.yangjy.efficientadb.model.AdbShortcutGroupModel
+import com.yangjy.efficientadb.model.AdbShortcutModel
 import com.yangjy.efficientadb.ui.ColorDivider
 import com.yangjy.efficientadb.ui.ColorGray
 import com.yangjy.efficientadb.ui.ColorText
@@ -80,7 +80,6 @@ import com.yangjy.efficientadb.ui.componects.ToastHost
 import com.yangjy.efficientadb.utils.AppPreferencesKey.ADB_CONFIGURATION
 import com.yangjy.efficientadb.utils.AppPreferencesKey.APP_PREFERENCES_TARGET_PACKAGE_NAME
 import com.yangjy.efficientadb.utils.JsonFormatUtil
-import efficientadb.composeapp.generated.resources.icon_app_logo_small
 import efficientadb.composeapp.generated.resources.icon_clear
 import efficientadb.composeapp.generated.resources.icon_send
 import io.github.vinceglb.filekit.core.FileKit
@@ -136,7 +135,6 @@ fun AdbPage(lifecycleOwner: LifecycleOwner = LocalLifecycleOwner.current) {
         }
     }
 
-
     fun executeCustomCommand(command: String) {
         resultText = "## $command\n$resultText"
         CommandExecutor.executeADB(androidHomePath, command, object : CommandExecuteCallback {
@@ -155,6 +153,66 @@ fun AdbPage(lifecycleOwner: LifecycleOwner = LocalLifecycleOwner.current) {
             }
         })
     }
+
+    fun prepareToExecute(shortCutModel: AdbShortcutModel) {
+        // Multi Command
+        if (shortCutModel.commandLine.contains(PlaceHolders.MULTI_COMMAND_SPLIT)) {
+            val commands = shortCutModel.commandLine.split(PlaceHolders.MULTI_COMMAND_SPLIT).map { it.trim() }
+            CoroutineScope(Dispatchers.Default).launch {
+                for (cmd in commands) {
+                    // 处理每个命令中的占位符
+                    val processedCmd = when {
+                        cmd.contains(PlaceHolders.FILE_PATH_HOLDER) -> {
+                            val file = FileKit.pickFile(title = "Pick File")
+                            file?.path?.let { path ->
+                                if (path.isNotEmpty() && path != "null") {
+                                    cmd.replace(PlaceHolders.FILE_PATH_HOLDER, path)
+                                } else {
+                                    null
+                                }
+                            } ?: continue
+                        }
+                        cmd.contains(PlaceHolders.PACKAGE_NAME_HOLDER) -> {
+                            cmd.replace(PlaceHolders.PACKAGE_NAME_HOLDER, packageName)
+                        }
+                        else -> cmd
+                    }
+                    // 执行处理后的命令
+                    executeCustomCommand(processedCmd)
+                    // 等待一小段时间确保命令执行完成
+                    delay(500)
+                }
+            }
+        } else {
+            // File Pick
+            if (shortCutModel.commandLine.contains(PlaceHolders.FILE_PATH_HOLDER)) {
+                CoroutineScope(Dispatchers.Default).launch {
+                    val file = FileKit.pickFile(title = "Pick File")
+                    file?.path?.let { path ->
+                        if (path.isNotEmpty() && path != "null") {
+                            val cmd: String = shortCutModel.commandLine.replace(
+                                PlaceHolders.FILE_PATH_HOLDER, path
+                            )
+                            executeCustomCommand(cmd)
+                        }
+                    }
+                }
+            } else if (shortCutModel.commandLine.contains(PlaceHolders.PACKAGE_NAME_HOLDER)) {
+                val cmd = shortCutModel.commandLine.replace(
+                    PlaceHolders.PACKAGE_NAME_HOLDER, packageName
+                )
+                CoroutineScope(Dispatchers.Default).launch {
+                    SettingsDelegate.putString(
+                        APP_PREFERENCES_TARGET_PACKAGE_NAME, packageName
+                    )
+                }
+                executeCustomCommand(cmd)
+            } else {
+                executeCustomCommand(shortCutModel.commandLine)
+            }
+        }
+    }
+
 
     /**
      * 获取设备基本信息
@@ -430,10 +488,11 @@ fun AdbPage(lifecycleOwner: LifecycleOwner = LocalLifecycleOwner.current) {
                         Image(
                             painter = painterResource(Res.drawable.icon_clear),
                             "clear",
-                            modifier = Modifier.align(Alignment.BottomEnd).alpha(0.2f).padding(end = 10.dp, bottom = 10.dp).height(20.dp)
+                            modifier = Modifier.align(Alignment.BottomEnd).alpha(0.2f)
+                                .padding(end = 10.dp, bottom = 10.dp).height(20.dp)
                                 .width(20.dp).clickable {
-                                resultText = ""
-                            },
+                                    resultText = ""
+                                },
                         )
                     }
                     // bottom command line input field
@@ -528,53 +587,29 @@ fun AdbPage(lifecycleOwner: LifecycleOwner = LocalLifecycleOwner.current) {
                     )
                     Spacer(modifier = Modifier.height(2.dp))
                 }
-                // shortcut groups
-                shortcutGroups.forEach {
-                    Text(
-                        fontSize = 12.sp,
-                        lineHeight = 12.sp,
-                        modifier = Modifier.fillMaxWidth().padding(top = 8.dp, bottom = 8.dp),
-                        textAlign = TextAlign.Start,
-                        text = it.title,
-                        fontWeight = FontWeight(600),
-                        color = ColorText
-                    )
-                    FlowRow(
-                        modifier = Modifier.fillMaxWidth(),
-                        horizontalArrangement = Arrangement.spacedBy(5.dp),
-                        verticalArrangement = Arrangement.spacedBy(8.dp)
-                    ) {
-                        // shortcut inside group
-                        it.shortcuts.forEach { shortCut ->
-                            SecondaryThemeButton({
-                                if (shortCut.commandLine.contains(PlaceHolders.FILE_PATH_HOLDER)) {
-                                    // require pick a file
-                                    CoroutineScope(Dispatchers.Default).launch {
-                                        val file = FileKit.pickFile(title = "Pick File")
-                                        println(file?.path)
-                                        file?.path?.let { path ->
-                                            if (path.isNotEmpty() && path != "null") {
-                                                val cmd: String = shortCut.commandLine.replace(
-                                                    PlaceHolders.FILE_PATH_HOLDER, path
-                                                )
-                                                executeCustomCommand(cmd)
-                                            }
-                                        }
-                                    }
-                                } else if (shortCut.commandLine.contains(PlaceHolders.PACKAGE_NAME_HOLDER)) {
-                                    val cmd = shortCut.commandLine.replace(
-                                        PlaceHolders.PACKAGE_NAME_HOLDER, packageName
-                                    )
-                                    CoroutineScope(Dispatchers.Default).launch {
-                                        SettingsDelegate.putString(
-                                            APP_PREFERENCES_TARGET_PACKAGE_NAME, packageName
-                                        )
-                                    }
-                                    executeCustomCommand(cmd)
-                                } else {
-                                    executeCustomCommand(shortCut.commandLine)
-                                }
-                            }, shortCut.name)
+                Column(modifier = Modifier.verticalScroll(rememberScrollState())) {
+                    // shortcut groups
+                    shortcutGroups.forEach {
+                        Text(
+                            fontSize = 12.sp,
+                            lineHeight = 12.sp,
+                            modifier = Modifier.fillMaxWidth().padding(top = 15.dp, bottom = 8.dp),
+                            textAlign = TextAlign.Start,
+                            text = it.title,
+                            fontWeight = FontWeight(600),
+                            color = ColorText
+                        )
+                        FlowRow(
+                            modifier = Modifier.fillMaxWidth(),
+                            horizontalArrangement = Arrangement.spacedBy(5.dp),
+                            verticalArrangement = Arrangement.spacedBy(8.dp)
+                        ) {
+                            // shortcut inside group
+                            it.shortcuts.forEach { shortCut ->
+                                SecondaryThemeButton({
+                                    prepareToExecute(shortCut)
+                                }, shortCut.name)
+                            }
                         }
                     }
                 }

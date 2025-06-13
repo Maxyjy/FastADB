@@ -28,7 +28,7 @@ object AdbCommandData {
             })
             add(AdbShortcutModel().apply {
                 name = "Restart"
-                commandLine = "${AdbCommands.ADB_KILL_APP}&&${AdbCommands.ADB_START_APP}"
+                commandLine = "${AdbCommands.ADB_KILL_APP}${PlaceHolders.MULTI_COMMAND_SPLIT}${AdbCommands.ADB_START_APP}"
             })
             add(AdbShortcutModel().apply {
                 name = "Clear Data"
@@ -90,11 +90,7 @@ object AdbCommandData {
             })
             add(AdbShortcutModel().apply {
                 name = "Root"
-                commandLine = AdbCommands.ADB_ROOT
-            })
-            add(AdbShortcutModel().apply {
-                name = "Remount"
-                commandLine = AdbCommands.ADB_REMOUNT
+                commandLine = "${AdbCommands.ADB_ROOT}${PlaceHolders.MULTI_COMMAND_SPLIT}${AdbCommands.ADB_REMOUNT}"
             })
             add(AdbShortcutModel().apply {
                 name = "Top Activity"

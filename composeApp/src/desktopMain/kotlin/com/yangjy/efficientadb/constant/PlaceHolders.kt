@@ -16,6 +16,6 @@ object PlaceHolders {
     const val DISPLAY_ID_HOLDER = "{DISPLAY_ID_HOLDER}"
     const val SPACE_HOLDER = "{SPACE_HOLDER}"
     const val TIME_STAMP_HOLDER = "{TIME_STAMP_HOLDER}"
-    const val MULTI_COMMAND_SPLIT = "&&"
+    const val MULTI_COMMAND_SPLIT = "{&&}"
 
 }

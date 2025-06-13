@@ -36,6 +36,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.alpha
 import androidx.compose.ui.draw.rotate
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.graphics.ColorFilter
 import androidx.compose.ui.platform.LocalLifecycleOwner
 import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.font.FontWeight
@@ -48,11 +49,15 @@ import androidx.compose.ui.window.Dialog
 import androidx.lifecycle.Lifecycle
 import androidx.lifecycle.LifecycleEventObserver
 import androidx.lifecycle.LifecycleOwner
+import com.yangjy.efficientadb.constant.PlaceHolders.FILE_PATH_HOLDER
+import com.yangjy.efficientadb.constant.PlaceHolders.MULTI_COMMAND_SPLIT
+import com.yangjy.efficientadb.constant.PlaceHolders.PACKAGE_NAME_HOLDER
 import com.yangjy.efficientadb.model.AdbShortcutGroupModel
 import com.yangjy.efficientadb.model.AdbShortcutModel
 import com.yangjy.efficientadb.ui.ColorDivider
 import com.yangjy.efficientadb.ui.ColorEditable
 import com.yangjy.efficientadb.ui.ColorEditablePressed
+import com.yangjy.efficientadb.ui.ColorMoveUpDownIcon
 import com.yangjy.efficientadb.ui.ColorText
 import com.yangjy.efficientadb.ui.ColorTextPressed
 import com.yangjy.efficientadb.ui.ColorTheme
@@ -67,6 +72,8 @@ import com.yangjy.efficientadb.utils.SettingsDelegate
 import efficientadb.composeapp.generated.resources.Res
 import efficientadb.composeapp.generated.resources.icon_add
 import efficientadb.composeapp.generated.resources.icon_drop_down
+import efficientadb.composeapp.generated.resources.icon_move_down
+import efficientadb.composeapp.generated.resources.icon_move_up
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
@@ -344,6 +351,54 @@ fun AdbEditPage(lifecycleOwner: LifecycleOwner = LocalLifecycleOwner.current) {
         }
     }
 
+    fun moveShortcutUp(shortcutModel: AdbShortcutModel) {
+        selectedGroup?.let { group ->
+            val shortcuts = group.shortcuts.toMutableList()
+            val currentIndex = shortcuts.indexOf(shortcutModel)
+            if (currentIndex > 0) {
+                // 交换位置
+                shortcuts[currentIndex] = shortcuts[currentIndex - 1]
+                shortcuts[currentIndex - 1] = shortcutModel
+                // 更新组
+                val updatedGroup = group.apply {
+                    this.shortcuts = shortcuts
+                }
+                val groupIndex = shortcutGroups.indexOf(group)
+                if (groupIndex != -1) {
+                    shortcutGroups = ArrayList(shortcutGroups).apply {
+                        set(groupIndex, updatedGroup)
+                    }
+                    selectedGroup = updatedGroup
+                    saveChanges(ACTION_EDIT)
+                }
+            }
+        }
+    }
+
+    fun moveShortcutDown(shortcutModel: AdbShortcutModel) {
+        selectedGroup?.let { group ->
+            val shortcuts = group.shortcuts.toMutableList()
+            val currentIndex = shortcuts.indexOf(shortcutModel)
+            if (currentIndex < shortcuts.size - 1) {
+                // 交换位置
+                shortcuts[currentIndex] = shortcuts[currentIndex + 1]
+                shortcuts[currentIndex + 1] = shortcutModel
+                // 更新组
+                val updatedGroup = group.apply {
+                    this.shortcuts = shortcuts
+                }
+                val groupIndex = shortcutGroups.indexOf(group)
+                if (groupIndex != -1) {
+                    shortcutGroups = ArrayList(shortcutGroups).apply {
+                        set(groupIndex, updatedGroup)
+                    }
+                    selectedGroup = updatedGroup
+                    saveChanges(ACTION_EDIT)
+                }
+            }
+        }
+    }
+
     DisposableEffect(key1 = lifecycleOwner) {
         val observer = LifecycleEventObserver { _, event ->
             if (event == Lifecycle.Event.ON_START) {
@@ -389,7 +444,7 @@ fun AdbEditPage(lifecycleOwner: LifecycleOwner = LocalLifecycleOwner.current) {
                     horizontalArrangement = Arrangement.End
                 ) {
                     TextButton(
-                        "Edit",
+                        "Edit Title",
                         textSize = 12.sp,
                         textColor = ColorEditable,
                         textPressedColor = ColorEditablePressed,
@@ -435,7 +490,9 @@ fun AdbEditPage(lifecycleOwner: LifecycleOwner = LocalLifecycleOwner.current) {
                         onDelete = { adbShortcutModel ->
                             deleteShortcut(adbShortcutModel)
                             saveChanges(ACTION_EDIT)
-                        }
+                        },
+                        onMoveUp = { adbShortcutModel -> moveShortcutUp(adbShortcutModel) },
+                        onMoveDown = { adbShortcutModel -> moveShortcutDown(adbShortcutModel) }
                     )
                     Divider(
                         modifier = Modifier.fillMaxWidth().height(0.3.dp).background(ColorDivider)
@@ -530,7 +587,30 @@ fun AdbEditPage(lifecycleOwner: LifecycleOwner = LocalLifecycleOwner.current) {
                     ) {
                         SelectionContainer {
                             Text(
-                                text = "{FILE_NAME_HOLDER}",
+                                text = MULTI_COMMAND_SPLIT,
+                                color = ColorTheme,
+                                fontSize = 10.sp
+                            )
+                        }
+                        Text(
+                            text = " - Connect two commands and execute them in sequence.",
+                            color = ColorTextGrayHint,
+                            fontSize = 10.sp
+                        )
+                    }
+                    Text(
+                        modifier = Modifier.padding(bottom = 10.dp),
+                        text = "eg. adb root {&&} adb remount",
+                        color = ColorTextGrayHint,
+                        fontSize = 10.sp
+                    )
+                    Row(
+                        modifier = Modifier.padding(bottom = 0.dp),
+                        verticalAlignment = Alignment.CenterVertically
+                    ) {
+                        SelectionContainer {
+                            Text(
+                                text = FILE_PATH_HOLDER,
                                 color = ColorTheme,
                                 fontSize = 10.sp
                             )
@@ -553,7 +633,7 @@ fun AdbEditPage(lifecycleOwner: LifecycleOwner = LocalLifecycleOwner.current) {
                     ) {
                         SelectionContainer {
                             Text(
-                                text = "{PACKAGE_NAME_HOLDER}",
+                                text = PACKAGE_NAME_HOLDER,
                                 color = ColorTheme,
                                 fontSize = 10.sp
                             )
@@ -818,7 +898,9 @@ fun NewGroupChip(onClick: () -> Unit = {}) {
 fun AdbShortcutModelItem(
     shortcutModel: AdbShortcutModel,
     onEdit: (AdbShortcutModel) -> Unit = {},
-    onDelete: (AdbShortcutModel) -> Unit = {}
+    onDelete: (AdbShortcutModel) -> Unit = {},
+    onMoveUp: (AdbShortcutModel) -> Unit = {},
+    onMoveDown: (AdbShortcutModel) -> Unit = {}
 ) {
     Row(
         modifier = Modifier.fillMaxWidth().wrapContentHeight()
@@ -857,7 +939,32 @@ fun AdbShortcutModelItem(
             )
         }
         Column(
-            modifier = Modifier.wrapContentWidth().fillMaxHeight(),
+            modifier = Modifier.wrapContentWidth().fillMaxHeight().padding(end = 10.dp),
+            verticalArrangement = Arrangement.Center
+        ) {
+            Image(
+                painter = painterResource(Res.drawable.icon_move_up),
+                contentDescription = "Move Up",
+                modifier = Modifier
+                    .padding(horizontal = 4.dp)
+                    .clickable {
+                        onMoveUp(shortcutModel)
+                    },
+                colorFilter = ColorFilter.tint(ColorMoveUpDownIcon)
+            )
+            Image(
+                painter = painterResource(Res.drawable.icon_move_down),
+                contentDescription = "Move Down",
+                modifier = Modifier
+                    .padding(horizontal = 4.dp)
+                    .clickable {
+                        onMoveDown(shortcutModel)
+                    },
+                colorFilter = ColorFilter.tint(ColorMoveUpDownIcon)
+            )
+        }
+        Column(
+            modifier = Modifier.wrapContentWidth().fillMaxHeight().padding(bottom = 3.dp),
             verticalArrangement = Arrangement.Center
         ) {
             TextButton(
