@@ -48,35 +48,51 @@ import org.jetbrains.compose.resources.painterResource
  */
 @Composable
 fun AboutPage() {
-    Column {
-        Text(
-            "About",
-            fontSize = 30.sp,
-            fontWeight = FontWeight(600),
-            modifier = Modifier.padding(0.dp, 0.dp, 0.dp, 10.dp)
-        )
-        Column(
-            modifier = Modifier.wrapContentHeight(),
-            verticalArrangement = Arrangement.Bottom
+    Column(
+        modifier = Modifier.fillMaxHeight(),
+    ) {
+        Column {
+            Text(
+                "About",
+                fontSize = 30.sp,
+                fontWeight = FontWeight(600),
+                modifier = Modifier.padding(0.dp, 0.dp, 0.dp, 30.dp)
+            )
+            Text(
+                text = "Efficient ADB 1.3.0",
+                fontSize = 16.sp,
+                lineHeight = 14.sp,
+                color = ColorText,
+                modifier = Modifier.padding(start = 5.dp),
+                textAlign = TextAlign.Start,
+            )
+            Text(
+                text = "Developed by YangJianyu",
+                fontSize = 13.sp,
+                lineHeight = 14.sp,
+                color = ColorText,
+                modifier = Modifier.padding(start = 5.dp, top = 10.dp),
+                textAlign = TextAlign.Start,
+            )
+        }
+
+        Row(
+            verticalAlignment = Alignment.CenterVertically,
+            modifier = Modifier.padding(start = 5.dp, top = 30.dp,bottom = 20.dp)
         ) {
-            Row(
-                verticalAlignment = Alignment.CenterVertically,
-                modifier = Modifier.padding(top = 5.dp)
-            ) {
-                Image(
-                    modifier = Modifier.width(14.dp).padding(bottom = 0.dp),
-                    contentDescription = "kotlin icon",
-                    painter = painterResource(Res.drawable.icon_kotlin)
-                )
-                Text(
-                    text = "Kotlin MultiPlatform",
-                    fontSize = 14.sp,
-                    lineHeight = 14.sp,
-                    color = ColorText,
-                    modifier = Modifier.padding(start = 5.dp),
-                    textAlign = TextAlign.Start,
-                )
-            }
+            Image(
+                modifier = Modifier.width(14.dp).padding(bottom = 0.dp),
+                contentDescription = "kotlin icon",
+                painter = painterResource(Res.drawable.icon_kotlin)
+            )
+            Text(
+                text = "Kotlin MultiPlatform",
+                fontSize = 14.sp,
+                lineHeight = 14.sp,
+                color = ColorText,
+                modifier = Modifier.padding(start = 5.dp),
+                textAlign = TextAlign.Start,
+            )
         }
     }
 }
