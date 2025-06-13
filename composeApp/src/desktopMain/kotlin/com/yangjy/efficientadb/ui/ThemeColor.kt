@@ -13,12 +13,18 @@ val ColorPanelBackground = Color(0xfff7f7f7)
 val ColorPanelBackgroundWin = Color(0xfffffff)
 
 val ColorText = Color(0xe6000000)
+val ColorTextPressed = Color(0xE6888888)
 val ColorTheme = Color(0xffdb5555)
+val ColorThemePressed = Color(0xFF8D2929)
 val ColorThemeHint = Color(0x11fc9494)
 val ColorThemeProgressBar = Color(0x11fc9494)
 val ColorGray = Color(0xffe3e2e8)
 val ColorDivider = Color(0xffdcdcdc)
 val ColorDisable = Color(0xffbfbfbf)
+val ColorTextSecondary = Color(0xCC000000)
+val ColorTextGrayHint = Color(0xCC6B6B6B)
+val ColorEditable = Color(0xff0052D9)
+val ColorEditablePressed = Color(0xff2051A3)
 
 val DimenDivider = 0.5.dp
 val RoundedCorner = 8.dp

@@ -9,9 +9,9 @@ import com.yangjy.efficientadb.model.AdbShortcutModel
  * @author YangJianyu
  * @date 2025/6/6
  */
-object AdbCommandMockData {
+object AdbCommandData {
 
-    fun getMockData(): List<AdbShortcutGroupModel> {
+    fun getDefault(): List<AdbShortcutGroupModel> {
         val groups = ArrayList<AdbShortcutGroupModel>()
 
         val appControlGroups = AdbShortcutGroupModel()

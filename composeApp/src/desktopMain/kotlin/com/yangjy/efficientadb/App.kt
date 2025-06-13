@@ -20,6 +20,11 @@ import com.yangjy.efficientadb.ui.ColorDivider
 import com.yangjy.efficientadb.ui.ColorPanelBackground
 import com.yangjy.efficientadb.ui.DimenDivider
 import com.yangjy.efficientadb.ui.SideBar
+import com.yangjy.efficientadb.ui.page.AboutPage
+import com.yangjy.efficientadb.ui.page.AdbEditPage
+import com.yangjy.efficientadb.ui.page.JsonFormatPage
+import com.yangjy.efficientadb.ui.page.SettingsPage
+import com.yangjy.efficientadb.ui.page.Base64Page
 import org.jetbrains.compose.ui.tooling.preview.Preview
 
 
@@ -53,6 +58,26 @@ fun App(lifecycleOwner: LifecycleOwner = LocalLifecycleOwner.current) {
                 when (rightPanelIndex) {
                     0 -> {
                         AdbPage()
+                    }
+
+                    1 -> {
+                        AdbEditPage()
+                    }
+
+                    2 -> {
+                        JsonFormatPage()
+                    }
+
+                    3 -> {
+                        Base64Page()
+                    }
+
+                    4 -> {
+                        SettingsPage()
+                    }
+
+                    -1 -> {
+                        AboutPage()
                     }
                 }
             }

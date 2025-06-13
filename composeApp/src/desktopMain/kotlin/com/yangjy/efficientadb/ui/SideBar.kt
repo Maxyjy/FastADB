@@ -38,6 +38,7 @@ import efficientadb.composeapp.generated.resources.icon_app_logo_small
 import efficientadb.composeapp.generated.resources.icon_base_64
 import efficientadb.composeapp.generated.resources.icon_json_format
 import efficientadb.composeapp.generated.resources.icon_log_merge
+import efficientadb.composeapp.generated.resources.icon_settings
 import org.jetbrains.compose.resources.DrawableResource
 import org.jetbrains.compose.resources.painterResource
 import org.jetbrains.compose.ui.tooling.preview.Preview
@@ -65,7 +66,7 @@ fun SideBar(onIndexChangeListener: (Int) -> Unit) {
             interactionSource = MutableInteractionSource(),
             indication = null
         ) {
-            onItemClickListener.invoke(8)
+            onItemClickListener.invoke(-1)
         }) {
             Image(
                 painter = painterResource(Res.drawable.icon_app_logo_small),
@@ -73,16 +74,17 @@ fun SideBar(onIndexChangeListener: (Int) -> Unit) {
                 modifier = Modifier.height(50.dp).width(50.dp),
             )
         }
-
         MenuItem(0, "ADB Execute", Res.drawable.icon_adb, onItemClickListener, selectedIndex)
+        MenuItem(1, "ADB Edit", Res.drawable.icon_apk, onItemClickListener, selectedIndex)
         MenuItem(
-            1,
+            2,
             "Json Format",
             Res.drawable.icon_json_format,
             onItemClickListener,
             selectedIndex
         )
-        MenuItem(2, "Base64", Res.drawable.icon_base_64, onItemClickListener, selectedIndex)
+        MenuItem(3, "Base64", Res.drawable.icon_base_64, onItemClickListener, selectedIndex)
+        MenuItem(4, "Settings", Res.drawable.icon_settings, onItemClickListener, selectedIndex)
 
         Column(
             horizontalAlignment = Alignment.CenterHorizontally,

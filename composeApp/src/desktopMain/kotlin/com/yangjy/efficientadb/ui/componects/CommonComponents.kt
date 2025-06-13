@@ -4,8 +4,10 @@ import androidx.compose.foundation.background
 import androidx.compose.foundation.border
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.interaction.MutableInteractionSource
+import androidx.compose.foundation.interaction.collectIsHoveredAsState
 import androidx.compose.foundation.interaction.collectIsPressedAsState
 import androidx.compose.foundation.layout.Box
+import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.Button
@@ -20,10 +22,13 @@ import androidx.compose.ui.text.font.FontFamily
 import androidx.compose.ui.text.font.FontStyle
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
+import androidx.compose.ui.text.style.TextOverflow
+import androidx.compose.ui.unit.TextUnit
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.yangjy.efficientadb.ui.ButtonRoundedCorner
 import com.yangjy.efficientadb.ui.ColorTheme
+import kotlinx.datetime.format.Padding
 
 /**
  *
@@ -33,10 +38,39 @@ import com.yangjy.efficientadb.ui.ColorTheme
  */
 
 @Composable
+fun TextButton(
+    text: String,
+    textSize: TextUnit,
+    textColor: Color,
+    textPressedColor: Color,
+    padding: PaddingValues,
+    onClick: () -> Unit
+) {
+    val interactionSource = remember { MutableInteractionSource() }
+    val isPressed by interactionSource.collectIsPressedAsState()
+    val isHovered by interactionSource.collectIsHoveredAsState()
+
+    Text(
+        text = text,
+        fontSize = textSize,
+        color = when {
+            isPressed -> textPressedColor
+            else -> textColor
+        },
+        modifier = Modifier
+            .clickable(
+                interactionSource = interactionSource,
+                indication = null
+            ) { onClick() }
+            .padding(padding)
+    )
+}
+
+@Composable
 fun SecondaryThemeButton(onClick: () -> Unit, text: String, enable: Boolean = true) {
     val interactionSource = remember { MutableInteractionSource() }
     val isPressed by interactionSource.collectIsPressedAsState()
-    
+
     Box(
         modifier = Modifier
             .clickable(
@@ -100,6 +134,8 @@ fun ThemeText(text: String) {
         letterSpacing = 0.5.sp,
         fontFamily = FontFamily.Default,
         text = text,
+        maxLines = 1,
+        overflow = TextOverflow.Ellipsis
     )
 }
 

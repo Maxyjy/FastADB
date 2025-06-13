@@ -59,21 +59,32 @@ import org.jetbrains.compose.ui.tooling.preview.Preview
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.text.KeyboardOptions
-import androidx.compose.foundation.text.selection.SelectionContainer
+import androidx.compose.material.Divider
 import androidx.compose.ui.input.key.*
 import androidx.compose.ui.text.style.TextOverflow
+import com.yangjy.efficientadb.constant.AdbCommandData
 import com.yangjy.efficientadb.constant.AdbCommands
-import com.yangjy.efficientadb.constant.AdbCommandMockData
 import com.yangjy.efficientadb.constant.PlaceHolders
-import com.yangjy.efficientadb.constant.PlaceHolders.MULTI_COMMAND_SPLIT
+import com.yangjy.efficientadb.constant.PlaceHolders.SPACE_HOLDER
+import com.yangjy.efficientadb.model.AdbShortcutGroupModel
 import com.yangjy.efficientadb.ui.ColorDivider
 import com.yangjy.efficientadb.ui.ColorGray
 import com.yangjy.efficientadb.ui.ColorText
+import com.yangjy.efficientadb.ui.ColorTextGrayHint
 import com.yangjy.efficientadb.ui.ColorTheme
 import com.yangjy.efficientadb.ui.DimenDivider
 import com.yangjy.efficientadb.ui.RoundedCorner
 import com.yangjy.efficientadb.ui.componects.SecondaryThemeButton
 import com.yangjy.efficientadb.ui.componects.ThemeButton
+import com.yangjy.efficientadb.ui.componects.ToastHost
+import com.yangjy.efficientadb.utils.AppPreferencesKey.ADB_CONFIGURATION
+import com.yangjy.efficientadb.utils.AppPreferencesKey.APP_PREFERENCES_TARGET_PACKAGE_NAME
+import com.yangjy.efficientadb.utils.JsonFormatUtil
+import efficientadb.composeapp.generated.resources.icon_app_logo_small
+import efficientadb.composeapp.generated.resources.icon_clear
+import efficientadb.composeapp.generated.resources.icon_send
+import io.github.vinceglb.filekit.core.FileKit
+import io.github.vinceglb.filekit.core.pickFile
 import kotlinx.coroutines.delay
 import java.util.Timer
 import java.util.TimerTask
@@ -105,7 +116,11 @@ fun AdbPage(lifecycleOwner: LifecycleOwner = LocalLifecycleOwner.current) {
     var deviceBuildVersion by remember { mutableStateOf("") }
 
     // 使用已有的 AdbCommandMockData
-    var shortcutGroups by remember { mutableStateOf(AdbCommandMockData.getMockData()) }
+    var shortcutGroups by remember { mutableStateOf(ArrayList<AdbShortcutGroupModel>()) }
+
+    // Toast 相关状态
+    var showToast by remember { mutableStateOf(false) }
+    var toastMessage by remember { mutableStateOf("") }
 
     val launcher = rememberDirectoryPickerLauncher(
         title = "Pick Android Home Path",
@@ -121,35 +136,24 @@ fun AdbPage(lifecycleOwner: LifecycleOwner = LocalLifecycleOwner.current) {
         }
     }
 
-    fun placeHolderReplace(command: String): String {
-        var result = command
-        if (command.contains(PlaceHolders.PACKAGE_NAME_HOLDER)) {
-            result = command.replace(PlaceHolders.PACKAGE_NAME_HOLDER, packageName)
-        }
-        return result
-    }
 
     fun executeCustomCommand(command: String) {
         resultText = "## $command\n$resultText"
-        CommandExecutor.executeADB(
-            androidHomePath,
-            command,
-            object : CommandExecuteCallback {
-                override fun onInputPrint(line: String) {
-                    resultText = "$line\n$resultText"
-                }
-
-                override fun onErrorPrint(line: String) {
-                    resultText = "$line\n$resultText"
-                }
-
-                override fun onExit(exitCode: Int) {
-                    super.onExit(exitCode)
-                    code = exitCode.toString()
-                    resultText = "Exit Code: $exitCode\n$resultText"
-                }
+        CommandExecutor.executeADB(androidHomePath, command, object : CommandExecuteCallback {
+            override fun onInputPrint(line: String) {
+                resultText = "$line\n$resultText"
             }
-        )
+
+            override fun onErrorPrint(line: String) {
+                resultText = "$line\n$resultText"
+            }
+
+            override fun onExit(exitCode: Int) {
+                super.onExit(exitCode)
+                code = exitCode.toString()
+                resultText = "Exit Code: $exitCode\n$resultText"
+            }
+        })
     }
 
     /**
@@ -157,8 +161,7 @@ fun AdbPage(lifecycleOwner: LifecycleOwner = LocalLifecycleOwner.current) {
      */
     fun fetchDeviceInfo() {
         // 获取设备品牌
-        CommandExecutor.executeADB(
-            androidHomePath,
+        CommandExecutor.executeADB(androidHomePath,
             AdbCommands.ADB_DEVICE_BRAND,
             object : CommandExecuteCallback {
                 override fun onInputPrint(line: String) {
@@ -168,12 +171,10 @@ fun AdbPage(lifecycleOwner: LifecycleOwner = LocalLifecycleOwner.current) {
                 override fun onErrorPrint(line: String) {
                     deviceBrand = ""
                 }
-            }
-        )
+            })
 
         // 获取设备型号
-        CommandExecutor.executeADB(
-            androidHomePath,
+        CommandExecutor.executeADB(androidHomePath,
             AdbCommands.ADB_DEVICE_NAME,
             object : CommandExecuteCallback {
                 override fun onInputPrint(line: String) {
@@ -183,12 +184,10 @@ fun AdbPage(lifecycleOwner: LifecycleOwner = LocalLifecycleOwner.current) {
                 override fun onErrorPrint(line: String) {
                     deviceName = "No Connected Device"
                 }
-            }
-        )
+            })
 
         // 获取Android版本
-        CommandExecutor.executeADB(
-            androidHomePath,
+        CommandExecutor.executeADB(androidHomePath,
             AdbCommands.ADB_ANDROID_VERSION,
             object : CommandExecuteCallback {
                 override fun onInputPrint(line: String) {
@@ -198,12 +197,10 @@ fun AdbPage(lifecycleOwner: LifecycleOwner = LocalLifecycleOwner.current) {
                 override fun onErrorPrint(line: String) {
                     deviceAndroidVersion = ""
                 }
-            }
-        )
+            })
 
         // 获取系统构建版本
-        CommandExecutor.executeADB(
-            androidHomePath,
+        CommandExecutor.executeADB(androidHomePath,
             AdbCommands.ADB_BUILD_VERSION,
             object : CommandExecuteCallback {
                 override fun onInputPrint(line: String) {
@@ -213,15 +210,32 @@ fun AdbPage(lifecycleOwner: LifecycleOwner = LocalLifecycleOwner.current) {
                 override fun onErrorPrint(line: String) {
                     deviceBuildVersion = ""
                 }
-            }
-        )
+            })
     }
 
     DisposableEffect(key1 = lifecycleOwner) {
         // 进入组件时执行，lifecycleOwner 改变后重新执行（先回调 onDispose）
+        var timer: Timer? = null
         val observer = LifecycleEventObserver { _, event ->
             if (event == Lifecycle.Event.ON_START) {
                 CoroutineScope(Dispatchers.Default).launch {
+                    val savedPackageName =
+                        SettingsDelegate.getString(APP_PREFERENCES_TARGET_PACKAGE_NAME)
+                    packageName = savedPackageName
+
+                    val json = SettingsDelegate.getString(ADB_CONFIGURATION)
+                    shortcutGroups =
+                        JsonFormatUtil.parseShortcutGroups(json) as ArrayList<AdbShortcutGroupModel>
+                    if (shortcutGroups.isEmpty()) {
+                        shortcutGroups =
+                            AdbCommandData.getDefault() as ArrayList<AdbShortcutGroupModel>
+                        SettingsDelegate.putString(
+                            ADB_CONFIGURATION, JsonFormatUtil.formatShortcutGroups(shortcutGroups)
+                        )
+                        showToast = true
+                        toastMessage = "Default ADB Commands loaded"
+                    }
+
                     androidHomePath = SettingsDelegate.getString(ANDROID_HOME_PATH)
                     if (androidHomePath.isNotEmpty() && androidHomePath != "null") {
                         dialogState = false
@@ -232,16 +246,23 @@ fun AdbPage(lifecycleOwner: LifecycleOwner = LocalLifecycleOwner.current) {
                 }
             }
             if (event == Lifecycle.Event.ON_RESUME) {
-                val timer = Timer()
-                timer.scheduleAtFixedRate(object : TimerTask() {
+                timer = Timer()
+                timer?.scheduleAtFixedRate(object : TimerTask() {
                     override fun run() {
                         fetchDeviceInfo()
                     }
                 }, 0, 5000)
             }
+            if (event == Lifecycle.Event.ON_PAUSE) {
+                // 页面不可见时取消定时器
+                timer?.cancel()
+                timer = null
+            }
         }
         lifecycleOwner.lifecycle.addObserver(observer)
         onDispose {
+            timer?.cancel()
+            timer = null
             lifecycleOwner.lifecycle.removeObserver(observer)
         }
     }
@@ -273,16 +294,13 @@ fun AdbPage(lifecycleOwner: LifecycleOwner = LocalLifecycleOwner.current) {
 
                     Row(
                         verticalAlignment = Alignment.CenterVertically,
-                        modifier = Modifier.fillMaxWidth(1f)
-                            .height(50.dp)
-                            .padding(0.dp, 0.dp, 0.dp, 10.dp)
-                            .border(
+                        modifier = Modifier.fillMaxWidth(1f).height(50.dp)
+                            .padding(0.dp, 0.dp, 0.dp, 10.dp).border(
                                 DimenDivider,
                                 color = ColorDivider,
                                 shape = RoundedCornerShape(RoundedCorner)
                             ).background(
-                                Color.White,
-                                RoundedCornerShape(RoundedCorner)
+                                Color.White, RoundedCornerShape(RoundedCorner)
                             )
                     ) {
                         Box(modifier = Modifier.weight(1f)) {
@@ -296,15 +314,16 @@ fun AdbPage(lifecycleOwner: LifecycleOwner = LocalLifecycleOwner.current) {
                                         1f
                                     }
                                 },
-                                modifier = Modifier
-                                    .padding(top = 8.dp, bottom = 8.dp, start = 10.dp, end = 10.dp)
-                            )
-                            Text(
                                 modifier = Modifier.padding(
                                     top = 8.dp,
                                     bottom = 8.dp,
                                     start = 10.dp,
                                     end = 10.dp
+                                )
+                            )
+                            Text(
+                                modifier = Modifier.padding(
+                                    top = 8.dp, bottom = 8.dp, start = 10.dp, end = 10.dp
                                 ).alpha(androidHomePathHintAlpha),
                                 fontSize = 12.sp,
                                 textAlign = TextAlign.Center,
@@ -319,9 +338,8 @@ fun AdbPage(lifecycleOwner: LifecycleOwner = LocalLifecycleOwner.current) {
                             colorFilter = ColorFilter.tint(
                                 ColorTheme
                             ),
-                            modifier = Modifier.padding(end = 8.dp)
-                                .height(26.dp)
-                                .width(26.dp).clickable(
+                            modifier = Modifier.padding(end = 8.dp).height(26.dp).width(26.dp)
+                                .clickable(
                                 ) {
                                     launcher.launch()
                                 }.padding(3.dp)
@@ -370,9 +388,7 @@ fun AdbPage(lifecycleOwner: LifecycleOwner = LocalLifecycleOwner.current) {
                             textAlign = TextAlign.Start,
                         ),
                         onValueChange = {},
-                        modifier = Modifier
-                            .padding(2.dp, 0.dp, 20.dp, 0.dp)
-                            .fillMaxWidth(),
+                        modifier = Modifier.padding(2.dp, 0.dp, 20.dp, 0.dp).fillMaxWidth(),
                         maxLines = 1
                     )
                 }
@@ -387,68 +403,80 @@ fun AdbPage(lifecycleOwner: LifecycleOwner = LocalLifecycleOwner.current) {
                         ),
                         onValueChange = {},
                         modifier = Modifier.padding(2.dp, 5.dp, 20.dp, 10.dp),
+                        maxLines = 1,
                     )
                 }
-                BasicTextField(
-                    value = resultText,
-                    onValueChange = {},
-                    textStyle = TextStyle(
-                        fontSize = 12.sp,
-                        textAlign = TextAlign.Start,
-                        fontWeight = FontWeight(500)
-                    ),
-                    readOnly = true,
-                    modifier = Modifier
-                        .fillMaxWidth()
-                        .weight(1f)
-                        .verticalScroll(rememberScrollState())
-                        .background(
-                            Color.White, RoundedCornerShape(8.dp)
-                        )
-                        .border(
-                            0.5.dp,
-                            color = Color(0xffdcdcdc),
-                            shape = RoundedCornerShape(8.dp)
-                        )
-                        .padding(horizontal = 10.dp, vertical = 20.dp)
-                )
-                // bottom command line input field
-                Row(
-                    modifier = Modifier.wrapContentHeight(),
-                    verticalAlignment = Alignment.CenterVertically
+                Column(
+                    modifier = Modifier.border(
+                        0.5.dp, color = Color(0xffdcdcdc), shape = RoundedCornerShape(8.dp)
+                    ).background(
+                        Color.White, RoundedCornerShape(8.dp)
+                    )
                 ) {
-                    BasicTextField(
-                        customCommand,
-                        textStyle = TextStyle(
-                            fontSize = 12.sp,
-                            lineHeight = 12.sp,
-                            fontWeight = FontWeight(500),
-                            fontStyle = FontStyle.Normal,
-                        ),
-                        onValueChange = {
-                            customCommand = it
-                        },
-                        singleLine = true,
-                        keyboardOptions = KeyboardOptions(imeAction = androidx.compose.ui.text.input.ImeAction.Done),
-                        modifier = Modifier
-                            .weight(1f)
-                            .border(
-                                0.5.dp,
-                                color = Color(0xffdcdcdc),
-                                shape = RoundedCornerShape(8.dp)
+                    Box(modifier = Modifier.weight(1f).fillMaxWidth()) {
+                        BasicTextField(
+                            value = resultText,
+                            onValueChange = {},
+                            textStyle = TextStyle(
+                                fontSize = 12.sp,
+                                textAlign = TextAlign.Start,
+                                fontWeight = FontWeight(500)
+                            ),
+                            readOnly = true,
+                            modifier = Modifier.padding(bottom = 30.dp).fillMaxWidth()
+                                .verticalScroll(rememberScrollState())
+                                .padding(horizontal = 10.dp, vertical = 20.dp)
+                        )
+                        Image(
+                            painter = painterResource(Res.drawable.icon_clear),
+                            "clear",
+                            modifier = Modifier.align(Alignment.BottomEnd).alpha(0.2f).padding(end = 10.dp, bottom = 10.dp).height(20.dp)
+                                .width(20.dp).clickable {
+                                resultText = ""
+                            },
+                        )
+                    }
+                    // bottom command line input field
+                    Divider(
+                        modifier = Modifier.fillMaxWidth().height(0.3.dp).background(ColorDivider)
+                            .alpha(0.3f)
+                    )
+                    Row(
+                        modifier = Modifier.wrapContentHeight().padding(
+                            paddingValues = PaddingValues(
+                                top = 12.dp, bottom = 12.dp, start = 10.dp, end = 10.dp
                             )
-                            .background(
-                                Color.White, RoundedCornerShape(8.dp)
-                            )
-                            .padding(
-                                paddingValues = PaddingValues(
-                                    top = 12.dp,
-                                    bottom = 12.dp,
-                                    start = 10.dp,
-                                    end = 10.dp
-                                )
-                            )
-                            .onKeyEvent { event ->
+                        ), verticalAlignment = Alignment.CenterVertically
+                    ) {
+                        BasicTextField(
+                            value = customCommand,
+                            textStyle = TextStyle(
+                                fontSize = 12.sp,
+                                lineHeight = 12.sp,
+                                fontWeight = FontWeight(500),
+                                fontStyle = FontStyle.Normal,
+                            ),
+                            onValueChange = {
+                                customCommand = it
+                            },
+                            singleLine = true,
+                            keyboardOptions = KeyboardOptions(imeAction = androidx.compose.ui.text.input.ImeAction.Done),
+                            decorationBox = { innerTextField ->
+                                Box {
+                                    if (customCommand.isEmpty()) {
+                                        Text(
+                                            "Input ADB Command..",
+                                            style = TextStyle(
+                                                fontSize = 12.sp,
+                                                lineHeight = 12.sp,
+                                                color = ColorTextGrayHint
+                                            )
+                                        )
+                                    }
+                                    innerTextField()
+                                }
+                            },
+                            modifier = Modifier.weight(1f).onKeyEvent { event ->
                                 if (event.key == Key.Enter && event.type == KeyEventType.KeyUp) {
                                     executeCustomCommand(customCommand)
                                     customCommand = ""
@@ -457,14 +485,16 @@ fun AdbPage(lifecycleOwner: LifecycleOwner = LocalLifecycleOwner.current) {
                                     false
                                 }
                             }
-                    )
-
-                    Spacer(modifier = Modifier.width(15.dp))
-
-                    ThemeButton(onClick = {
-                        executeCustomCommand(customCommand)
-                        customCommand = ""
-                    }, "Execute")
+                        )
+                        Image(
+                            painter = painterResource(Res.drawable.icon_send),
+                            "execute",
+                            modifier = Modifier.height(20.dp).width(20.dp).clickable {
+                                executeCustomCommand(customCommand)
+                                customCommand = ""
+                            },
+                        )
+                    }
                 }
             }
             // right button panel
@@ -510,20 +540,54 @@ fun AdbPage(lifecycleOwner: LifecycleOwner = LocalLifecycleOwner.current) {
                         color = ColorText
                     )
                     FlowRow(
-                        modifier = Modifier
-                            .fillMaxWidth(),
+                        modifier = Modifier.fillMaxWidth(),
                         horizontalArrangement = Arrangement.spacedBy(5.dp),
                         verticalArrangement = Arrangement.spacedBy(8.dp)
                     ) {
                         // shortcut inside group
                         it.shortcuts.forEach { shortCut ->
                             SecondaryThemeButton({
-                                executeCustomCommand(shortCut.commandLine)
+                                if (shortCut.commandLine.contains(PlaceHolders.FILE_PATH_HOLDER)) {
+                                    // require pick a file
+                                    CoroutineScope(Dispatchers.Default).launch {
+                                        val file = FileKit.pickFile(title = "Pick File")
+                                        println(file?.path)
+                                        file?.path?.let { path ->
+                                            if (path.isNotEmpty() && path != "null") {
+                                                val cmd: String = shortCut.commandLine.replace(
+                                                    PlaceHolders.FILE_PATH_HOLDER, path
+                                                )
+                                                executeCustomCommand(cmd)
+                                            }
+                                        }
+                                    }
+                                } else if (shortCut.commandLine.contains(PlaceHolders.PACKAGE_NAME_HOLDER)) {
+                                    val cmd = shortCut.commandLine.replace(
+                                        PlaceHolders.PACKAGE_NAME_HOLDER, packageName
+                                    )
+                                    CoroutineScope(Dispatchers.Default).launch {
+                                        SettingsDelegate.putString(
+                                            APP_PREFERENCES_TARGET_PACKAGE_NAME, packageName
+                                        )
+                                    }
+                                    executeCustomCommand(cmd)
+                                } else {
+                                    executeCustomCommand(shortCut.commandLine)
+                                }
                             }, shortCut.name)
                         }
                     }
                 }
             }
+        }
+    }
+    Box(modifier = Modifier.fillMaxWidth().fillMaxHeight()) {
+        if (showToast) {
+            ToastHost(
+                message = toastMessage,
+                onDismiss = { showToast = false },
+                modifier = Modifier.align(Alignment.BottomCenter).padding(bottom = 20.dp)
+            )
         }
     }
 }
