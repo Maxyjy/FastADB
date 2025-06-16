@@ -1,4 +1,4 @@
-rootProject.name = "EfficientADB"
+rootProject.name = "FastADB"
 enableFeaturePreview("TYPESAFE_PROJECT_ACCESSORS")
 
 pluginManagement {

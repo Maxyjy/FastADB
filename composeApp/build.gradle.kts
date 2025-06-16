@@ -43,16 +43,16 @@ kotlin {
 
 compose.desktop {
     application {
-        mainClass = "com.yangjy.efficientadb.MainKt"
+        mainClass = "com.yangjy.fastadb.MainKt"
 
         nativeDistributions {
             targetFormats(TargetFormat.Dmg, TargetFormat.Msi, TargetFormat.Deb)
-            packageName = "Efficient ADB"
+            packageName = "Fast ADB"
             version = 130
             packageVersion = "1.3.0"
-            description = "Efficient ADB"
+            description = "Fast ADB"
             macOS {
-                dockName = "Efficient ADB"
+                dockName = "Fast ADB"
                 iconFile.set(project.file("src/commonMain/composeResources/files/AppIcon.icns"))
             }
             windows{
