@@ -19,7 +19,7 @@ Windows : [Fast.ADB_1.3.1.zip](https://github.com/Maxyjy/FastADB/releases/downlo
 
 📤 Import/export your adb commands via JSON: You can import/export your command set in JSON format, making it easy to share with others or reuse configurations.
 
-## Cross-platform Support
+## Multi-Platform Support
 Built with Kotlin Multiplatform, Fast ADB runs on macOS, Windows, and Linux.
 
 ⚠️ Note for Linux users: You'll need to set up a KMP environment and build the app manually (generate a .deb), as the developer currently doesn't have a Linux device to assemble deb packages.
