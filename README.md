@@ -1,11 +1,27 @@
-This is a Kotlin Multiplatform project targeting Desktop.
 
-* `/composeApp` is for code that will be shared across your Compose Multiplatform applications.
-  It contains several subfolders:
-  - `commonMain` is for code that’s common for all targets.
-  - Other folders are for Kotlin code that will be compiled for only the platform indicated in the folder name.
-    For example, if you want to use Apple’s CoreCrypto for the iOS part of your Kotlin app,
-    `iosMain` would be the right folder for such calls.
+English | [中文](https://github.com/Maxyjy/FastADB/blob/main/README_ZH.md)
 
+# Fast ADB - A efficient tool for ADB Command Execution
 
-Learn more about [Kotlin Multiplatform](https://www.jetbrains.com/help/kotlin-multiplatform-dev/get-started.html)…
+Fast ADB is a utility designed specifically for Android developers and testers to simplify the use of ADB commands.
+Say goodbye to manually typing complex commands! this tool lets you execute frequently used ADB operations quickly and efficiently.
+
+## Features：
+🚀 One-click ADB execution: No need to remember or type ADB commands manually, just click one button to run.
+
+✏️ editable ADB command buttons panel: customize your own frequently used ADB commands.
+(Don’t worry, it comes with a set of commonly used default commands preloaded.)
+
+📤 Import/export your adb commands via JSON: You can import/export your command set in JSON format, making it easy to share with others or reuse configurations.
+
+## Cross-platform Support
+Built with Kotlin Multiplatform, Fast ADB runs on macOS, Windows, and Linux.
+
+⚠️ Note for Linux users: You'll need to set up a KMP environment and build the app manually (generate a .deb), as the developer currently doesn't have a Linux device to assemble deb packages.
+
+## ADB Command Execution Panel
+<img src="https://github.com/Maxyjy/FastADB/blob/main/screenshot/adb.png" alt="Fast ADB Logo" width="800"/>
+
+## Custom ADB Command Set
+<img src="https://github.com/Maxyjy/FastADB/blob/main/screenshot/edit.png" alt="Fast ADB Logo" width="800"/>
+<img src="https://github.com/Maxyjy/FastADB/blob/main/screenshot/edit_2.png" alt="Fast ADB Logo" width="800"/>
