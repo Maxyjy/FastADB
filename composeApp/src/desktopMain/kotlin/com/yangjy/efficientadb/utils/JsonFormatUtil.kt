@@ -15,22 +15,37 @@ import com.yangjy.efficientadb.model.AdbShortcutGroupModel
 class JsonFormatUtil {
 
     companion object {
-        private val format = Json { 
+        private val format = Json {
             prettyPrint = true
             ignoreUnknownKeys = true
         }
 
         fun format(json: String): String {
-            val ob = format.decodeFromString<JsonElement>(json)
-            return format.encodeToString(ob)
+            try {
+                val ob = format.decodeFromString<JsonElement>(json)
+                return format.encodeToString(ob)
+            } catch (e: Exception) {
+                println("json format error:$e")
+            }
+            return ""
         }
 
         fun parseShortcutGroups(json: String): List<AdbShortcutGroupModel> {
-            return format.decodeFromString<List<AdbShortcutGroupModel>>(json)
+            try {
+                return format.decodeFromString<List<AdbShortcutGroupModel>>(json)
+            } catch (e: Exception) {
+                println("json format error:$e")
+            }
+            return emptyList()
         }
 
         fun formatShortcutGroups(shortcutGroups: List<AdbShortcutGroupModel>): String {
-            return format.encodeToString(shortcutGroups)
+            try {
+                return format.encodeToString(shortcutGroups)
+            } catch (e: Exception) {
+                println("json format error:$e")
+            }
+            return ""
         }
 
     }
