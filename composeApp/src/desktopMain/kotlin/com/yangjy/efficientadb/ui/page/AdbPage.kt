@@ -59,7 +59,6 @@ import org.jetbrains.compose.ui.tooling.preview.Preview
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.text.KeyboardOptions
-import androidx.compose.material.Divider
 import androidx.compose.ui.input.key.*
 import androidx.compose.ui.text.style.TextOverflow
 import com.yangjy.efficientadb.constant.AdbCommandData
@@ -496,10 +495,7 @@ fun AdbPage(lifecycleOwner: LifecycleOwner = LocalLifecycleOwner.current) {
                         )
                     }
                     // bottom command line input field
-                    Divider(
-                        modifier = Modifier.fillMaxWidth().height(0.3.dp).background(ColorDivider)
-                            .alpha(0.3f)
-                    )
+                    Box(modifier = Modifier.fillMaxWidth().height(DimenDivider).background(ColorDivider))
                     Row(
                         modifier = Modifier.wrapContentHeight().padding(
                             paddingValues = PaddingValues(

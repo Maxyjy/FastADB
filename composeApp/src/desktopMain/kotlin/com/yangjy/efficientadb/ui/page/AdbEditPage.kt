@@ -7,6 +7,7 @@ import androidx.compose.foundation.clickable
 import androidx.compose.foundation.interaction.MutableInteractionSource
 import androidx.compose.foundation.interaction.collectIsPressedAsState
 import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.ExperimentalLayoutApi
 import androidx.compose.foundation.layout.PaddingValues
@@ -16,6 +17,7 @@ import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
+import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.layout.wrapContentHeight
 import androidx.compose.foundation.layout.wrapContentWidth
 import androidx.compose.foundation.rememberScrollState
@@ -23,7 +25,6 @@ import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.text.BasicTextField
 import androidx.compose.foundation.text.selection.SelectionContainer
 import androidx.compose.foundation.verticalScroll
-import androidx.compose.material.Divider
 import androidx.compose.material.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.DisposableEffect
@@ -65,6 +66,7 @@ import com.yangjy.efficientadb.ui.ColorThemeHint
 import com.yangjy.efficientadb.ui.ColorThemePressed
 import com.yangjy.efficientadb.ui.ColorTextGrayHint
 import com.yangjy.efficientadb.ui.ColorTextSecondary
+import com.yangjy.efficientadb.ui.DimenDivider
 import com.yangjy.efficientadb.ui.componects.TextButton
 import com.yangjy.efficientadb.utils.AppPreferencesKey.ADB_CONFIGURATION
 import com.yangjy.efficientadb.utils.JsonFormatUtil
@@ -149,11 +151,7 @@ fun GroupDropdown(
                             color = if (group == selectedGroup) ColorTheme else Color.Black
                         )
                     }
-                    Divider(
-                        modifier = Modifier.fillMaxWidth().height(0.3.dp)
-                            .background(ColorDivider)
-                            .alpha(0.2f)
-                    )
+                    Box(modifier = Modifier.fillMaxWidth().height(DimenDivider).background(ColorDivider))
                 }
 
                 // 添加新组的选项
@@ -494,10 +492,7 @@ fun AdbEditPage(lifecycleOwner: LifecycleOwner = LocalLifecycleOwner.current) {
                         onMoveUp = { adbShortcutModel -> moveShortcutUp(adbShortcutModel) },
                         onMoveDown = { adbShortcutModel -> moveShortcutDown(adbShortcutModel) }
                     )
-                    Divider(
-                        modifier = Modifier.fillMaxWidth().height(0.3.dp).background(ColorDivider)
-                            .alpha(0.3f)
-                    )
+                    Box(modifier = Modifier.fillMaxWidth().height(DimenDivider).background(ColorDivider))
                 }
                 NewAdbShortcutModelItem(
                     selectedGroup = selectedGroup,
