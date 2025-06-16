@@ -6,6 +6,11 @@ English | [中文](https://github.com/Maxyjy/FastADB/blob/main/README_ZH.md)
 Fast ADB is a utility designed specifically for Android developers and testers to simplify the use of ADB commands.
 Say goodbye to manually typing complex commands! this tool lets you execute frequently used ADB operations quickly and efficiently.
 
+## Download:
+MacOS :&nbsp;&nbsp;&nbsp;[Fast.ADB-1.3.1.dmg](https://github.com/Maxyjy/FastADB/releases/download/v1.3.1/Fast.ADB-1.3.1.dmg)
+
+Windows : [Fast.ADB_1.3.1.zip](https://github.com/Maxyjy/FastADB/releases/download/v1.3.1/Fast.ADB_1.3.1.zip)
+
 ## Features：
 🚀 One-click ADB execution: No need to remember or type ADB commands manually, just click one button to run.
 
