@@ -44,6 +44,7 @@ import com.yangjy.fastadb.ui.ColorTextGrayHint
 import com.yangjy.fastadb.ui.componects.ThemeButton
 import com.yangjy.fastadb.ui.componects.ToastHost
 import com.yangjy.fastadb.utils.AppPreferencesKey
+import com.yangjy.fastadb.utils.AppPreferencesKey.ANDROID_HOME_PATH
 import com.yangjy.fastadb.utils.SettingsDelegate
 import fastadb.composeapp.generated.resources.Res
 import fastadb.composeapp.generated.resources.icon_folder
@@ -106,6 +107,7 @@ fun AndroidHomeSetting(lifecycleOwner: LifecycleOwner) {
             path?.let {
                 if (it.isNotEmpty()) {
                     androidHomePath = it
+                    SettingsDelegate.putString(ANDROID_HOME_PATH,it)
                 }
             }
         }
@@ -117,8 +119,8 @@ fun AndroidHomeSetting(lifecycleOwner: LifecycleOwner) {
                 CoroutineScope(Dispatchers.Default).launch {
                     androidHomePath =
                         SettingsDelegate.getString(
-                            AppPreferencesKey.ANDROID_HOME_PATH
-                        ).toString()
+                            ANDROID_HOME_PATH
+                        )
                 }
             }
         }
@@ -158,7 +160,7 @@ fun AndroidHomeSetting(lifecycleOwner: LifecycleOwner) {
                 androidHomePath = it
                 CoroutineScope(Dispatchers.Default).launch {
                     SettingsDelegate.putString(
-                        AppPreferencesKey.ANDROID_HOME_PATH, androidHomePath
+                        ANDROID_HOME_PATH, androidHomePath
                     )
                 }
             },
