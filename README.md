@@ -1,5 +1,5 @@
 
-English | [中文](https://github.com/Maxyjy/FastADB/blob/main/README_ZH.md)
+English | [中文](https://github.com/Maxyjy/FastADB/blob/main/README_zh.md)
 
 # Fast ADB - A efficient tool for ADB Command Execution
 
