@@ -138,7 +138,7 @@ fun AndroidHomeSetting(lifecycleOwner: LifecycleOwner) {
         verticalAlignment = Alignment.CenterVertically,
         modifier = Modifier.fillMaxWidth(1f)
             .height(55.dp)
-            .padding(0.dp, 0.dp, 0.dp, 10.dp)
+            .padding(0.dp, 0.dp, 0.dp, 0.dp)
             .border(
                 DimenDivider,
                 color = ColorDivider,
@@ -193,6 +193,15 @@ fun AndroidHomeSetting(lifecycleOwner: LifecycleOwner) {
             )
         }
     }
+    Text(
+        modifier = Modifier.padding(
+            top = 5.dp, bottom = 10.dp, start = 10.dp, end = 10.dp
+        ),
+        fontSize = 10.sp,
+        textAlign = TextAlign.Center,
+        text = "e.g. '/Users/max/Library/Android/sdk/platform-tools' ,Make sure there is 'adb' under your path",
+        color = ColorTextGrayHint
+    )
 }
 
 @Composable

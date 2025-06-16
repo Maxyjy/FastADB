@@ -99,7 +99,7 @@ import java.util.TimerTask
 fun AdbPage(lifecycleOwner: LifecycleOwner = LocalLifecycleOwner.current) {
 
     var dialogState by remember { mutableStateOf(false) }
-    var androidHomePath by remember { mutableStateOf("/Users/max/Library/Android/sdk") }
+    var androidHomePath by remember { mutableStateOf("") }
     var androidHomePathHintAlpha by remember { mutableStateOf(1f) }
     var packageNameInputHint by remember { mutableStateOf(false) }
     var packageName by remember { mutableStateOf("") }
@@ -129,6 +129,11 @@ fun AdbPage(lifecycleOwner: LifecycleOwner = LocalLifecycleOwner.current) {
             path?.let {
                 if (it.isNotEmpty() && path != "null") {
                     androidHomePath = it
+                    androidHomePathHintAlpha = if (androidHomePath.isNotEmpty()) {
+                        0f
+                    } else {
+                        1f
+                    }
                 }
             }
         }
@@ -156,7 +161,8 @@ fun AdbPage(lifecycleOwner: LifecycleOwner = LocalLifecycleOwner.current) {
     fun prepareToExecute(shortCutModel: AdbShortcutModel) {
         // Multi Command
         if (shortCutModel.commandLine.contains(PlaceHolders.MULTI_COMMAND_SPLIT)) {
-            val commands = shortCutModel.commandLine.split(PlaceHolders.MULTI_COMMAND_SPLIT).map { it.trim() }
+            val commands =
+                shortCutModel.commandLine.split(PlaceHolders.MULTI_COMMAND_SPLIT).map { it.trim() }
             CoroutineScope(Dispatchers.Default).launch {
                 for (cmd in commands) {
                     // 处理每个命令中的占位符
@@ -171,9 +177,11 @@ fun AdbPage(lifecycleOwner: LifecycleOwner = LocalLifecycleOwner.current) {
                                 }
                             } ?: continue
                         }
+
                         cmd.contains(PlaceHolders.PACKAGE_NAME_HOLDER) -> {
                             cmd.replace(PlaceHolders.PACKAGE_NAME_HOLDER, packageName)
                         }
+
                         else -> cmd
                     }
                     // 执行处理后的命令
@@ -274,6 +282,7 @@ fun AdbPage(lifecycleOwner: LifecycleOwner = LocalLifecycleOwner.current) {
         // 进入组件时执行，lifecycleOwner 改变后重新执行（先回调 onDispose）
         var timer: Timer? = null
         val observer = LifecycleEventObserver { _, event ->
+            println("event :$event")
             if (event == Lifecycle.Event.ON_START) {
                 CoroutineScope(Dispatchers.Default).launch {
                     val savedPackageName =
@@ -296,6 +305,7 @@ fun AdbPage(lifecycleOwner: LifecycleOwner = LocalLifecycleOwner.current) {
                     androidHomePath = SettingsDelegate.getString(ANDROID_HOME_PATH)
                     if (androidHomePath.isNotEmpty() && androidHomePath != "null") {
                         dialogState = false
+                        fetchDeviceInfo()
                     } else {
                         dialogState = true
                         androidHomePath = ""
@@ -352,7 +362,7 @@ fun AdbPage(lifecycleOwner: LifecycleOwner = LocalLifecycleOwner.current) {
                     Row(
                         verticalAlignment = Alignment.CenterVertically,
                         modifier = Modifier.fillMaxWidth(1f).height(50.dp)
-                            .padding(0.dp, 0.dp, 0.dp, 10.dp).border(
+                            .padding(0.dp, 0.dp, 0.dp, 5.dp).border(
                                 DimenDivider,
                                 color = ColorDivider,
                                 shape = RoundedCornerShape(RoundedCorner)
@@ -385,7 +395,7 @@ fun AdbPage(lifecycleOwner: LifecycleOwner = LocalLifecycleOwner.current) {
                                 fontSize = 12.sp,
                                 textAlign = TextAlign.Center,
                                 lineHeight = 6.sp,
-                                text = "e.g. /../Android/sdk",
+                                text = "../platform-tools",
                                 color = ColorGray
                             )
                         }
@@ -402,6 +412,24 @@ fun AdbPage(lifecycleOwner: LifecycleOwner = LocalLifecycleOwner.current) {
                                 }.padding(3.dp)
                         )
                     }
+                    Text(
+                        modifier = Modifier.padding(
+                            top = 5.dp, bottom = 0.dp, start = 10.dp, end = 10.dp
+                        ),
+                        fontSize = 12.sp,
+                        textAlign = TextAlign.Center,
+                        text = "e.g. /Users/max/Library/Android/sdk/platform-tools",
+                        color = ColorTextGrayHint
+                    )
+                    Text(
+                        modifier = Modifier.padding(
+                            top = 0.dp, bottom = 5.dp, start = 10.dp, end = 10.dp
+                        ),
+                        fontSize = 12.sp,
+                        textAlign = TextAlign.Center,
+                        text = "Make sure there is 'adb' under your path",
+                        color = ColorTextGrayHint
+                    )
                     Row(
                         modifier = Modifier.fillMaxWidth().padding(top = 10.dp),
                         horizontalArrangement = Arrangement.End
@@ -413,6 +441,7 @@ fun AdbPage(lifecycleOwner: LifecycleOwner = LocalLifecycleOwner.current) {
                                 dialogState = false
                                 CoroutineScope(Dispatchers.Default).launch {
                                     SettingsDelegate.putString(ANDROID_HOME_PATH, androidHomePath)
+                                    fetchDeviceInfo()
                                 }
                             }
                         }, "Confirm")
@@ -495,7 +524,10 @@ fun AdbPage(lifecycleOwner: LifecycleOwner = LocalLifecycleOwner.current) {
                         )
                     }
                     // bottom command line input field
-                    Box(modifier = Modifier.fillMaxWidth().height(DimenDivider).background(ColorDivider))
+                    Box(
+                        modifier = Modifier.fillMaxWidth().height(DimenDivider)
+                            .background(ColorDivider)
+                    )
                     Row(
                         modifier = Modifier.wrapContentHeight().padding(
                             paddingValues = PaddingValues(

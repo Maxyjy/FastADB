@@ -24,7 +24,7 @@ object CommandExecutor {
                     callback.onErrorPrint("android path is empty, please relocate android home path")
                     return@launch
                 }
-                val adbCommandLine = "${androidHomePath}/platform-tools/" + commandLine
+                val adbCommandLine = "$androidHomePath/$commandLine"
                 println("execute: $adbCommandLine")
                 val finalAdbCommandLine = splitCommandLineAndUnquote(adbCommandLine)
 
