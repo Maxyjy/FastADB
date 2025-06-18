@@ -2,7 +2,9 @@ package com.yangjy.fastadb.utils
 
 import com.yangjy.fastadb.core.CommandExecuteCallback
 import com.yangjy.fastadb.core.CommandExecutor
+import com.yangjy.fastadb.getSystemName
 import java.io.File
+
 
 /**
  *
@@ -13,9 +15,16 @@ import java.io.File
 object ADBPathFinder {
 
     fun findADBPath(callback: (String) -> Unit) {
-        val path = System.getenv("PATH").split(":")
+        val path = System.getenv("PATH").split(
+            if (getSystemName().contains("Win")) {
+                ";"
+            } else {
+                ":"
+            }
+        )
         path.forEach {
-            if (it.contains("Android") && it.contains("platform-tools")) {
+            println("check path $it")
+            if (it.contains("platform-tools")) {
                 println("suspect adb path:$it")
                 val adbUnderPath = hasAdbFile(it)
                 println("is there adb under path?: $adbUnderPath")

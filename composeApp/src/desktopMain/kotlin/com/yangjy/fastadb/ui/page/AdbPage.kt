@@ -172,7 +172,7 @@ fun AdbPage(lifecycleOwner: LifecycleOwner = LocalLifecycleOwner.current) {
                             val file = FileKit.pickFile(title = "Pick File")
                             file?.path?.let { path ->
                                 if (path.isNotEmpty() && path != "null") {
-                                    cmd.replace(PlaceHolders.FILE_PATH_HOLDER, path)
+                                    cmd.replace(PlaceHolders.FILE_PATH_HOLDER, "'$path'")
                                 } else {
                                     null
                                 }
