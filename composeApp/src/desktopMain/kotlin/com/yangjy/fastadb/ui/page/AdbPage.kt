@@ -76,6 +76,7 @@ import com.yangjy.fastadb.ui.RoundedCorner
 import com.yangjy.fastadb.ui.componects.SecondaryThemeButton
 import com.yangjy.fastadb.ui.componects.ThemeButton
 import com.yangjy.fastadb.ui.componects.ToastHost
+import com.yangjy.fastadb.utils.ADBPathFinder
 import com.yangjy.fastadb.utils.AppPreferencesKey.ADB_CONFIGURATION
 import com.yangjy.fastadb.utils.AppPreferencesKey.APP_PREFERENCES_TARGET_PACKAGE_NAME
 import com.yangjy.fastadb.utils.JsonFormatUtil
@@ -307,8 +308,29 @@ fun AdbPage(lifecycleOwner: LifecycleOwner = LocalLifecycleOwner.current) {
                         dialogState = false
                         fetchDeviceInfo()
                     } else {
-                        dialogState = true
-                        androidHomePath = ""
+                        CoroutineScope(Dispatchers.Default).launch {
+                            var adbPathFound = false
+                            ADBPathFinder.findADBPath { adbPath ->
+                                if (adbPath.isNotEmpty()) {
+                                    CoroutineScope(Dispatchers.Main).launch {
+                                        adbPathFound = true
+                                        SettingsDelegate.putString(ANDROID_HOME_PATH, adbPath)
+                                        androidHomePath =
+                                            SettingsDelegate.getString(ANDROID_HOME_PATH)
+                                        fetchDeviceInfo()
+                                        dialogState = false
+                                        toastMessage =
+                                            "ADB path has been set automatically, It also can be manually modified in Settings."
+                                        showToast = true
+                                    }
+                                }
+                            }
+                            delay(2000L)
+                            if (!adbPathFound) {
+                                dialogState = true
+                                androidHomePath = ""
+                            }
+                        }
                     }
                 }
             }
