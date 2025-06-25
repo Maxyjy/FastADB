@@ -72,7 +72,7 @@ fun UnixTimePage() {
     var dateErrorMessage by remember { mutableStateOf("") }
     var timezone by remember { mutableStateOf(TimeZone.getDefault()) }
     var showTimezoneDropdown by remember { mutableStateOf(false) }
-    
+
     // 从StringResources获取时区选项
     val timezoneOptions = StringResources.getTimezoneOptions()
 
@@ -80,13 +80,13 @@ fun UnixTimePage() {
         // 设置当前时间戳
         val currentTimestamp = System.currentTimeMillis()
         timestampInput = currentTimestamp.toString()
-        
+
         // 设置当前可读日期
         val formatter = SimpleDateFormat("yyyy-MM-dd HH:mm:ss", Locale.getDefault())
         formatter.timeZone = timezone
         val currentDate = formatter.format(Date())
         dateInput = currentDate
-        
+
         // 自动进行转换
         // 时间戳转日期
         try {
@@ -98,7 +98,7 @@ fun UnixTimePage() {
             timestampOutput = ""
             timestampErrorMessage = StringResources.AUTO_CONVERSION_FAILED
         }
-        
+
         // 日期转时间戳
         try {
             val inputFormatter = SimpleDateFormat("yyyy-MM-dd HH:mm:ss", Locale.getDefault())
@@ -112,7 +112,7 @@ fun UnixTimePage() {
             dateErrorMessage = StringResources.AUTO_CONVERSION_FAILED
         }
     }
-    
+
     // 重新转换函数
     fun reconvertWithNewTimezone() {
         if (timestampInput.isNotEmpty()) {
@@ -126,7 +126,7 @@ fun UnixTimePage() {
                 timestampOutput = ""
             }
         }
-        
+
         if (dateInput.isNotEmpty()) {
             try {
                 val formatter = SimpleDateFormat("yyyy-MM-dd HH:mm:ss", Locale.getDefault())
@@ -162,7 +162,7 @@ fun UnixTimePage() {
                 fontWeight = FontWeight.Medium,
                 modifier = Modifier.padding(end = 12.dp)
             )
-            
+
             Box {
                 Box(
                     modifier = Modifier.clickable {
@@ -172,11 +172,15 @@ fun UnixTimePage() {
                     Row(
                         verticalAlignment = Alignment.CenterVertically,
                         modifier = Modifier
-                            .background(Color.LightGray.copy(alpha = 0.1f), RoundedCornerShape(8.dp))
+                            .background(
+                                Color.LightGray.copy(alpha = 0.1f),
+                                RoundedCornerShape(8.dp)
+                            )
                             .padding(horizontal = 12.dp, vertical = 8.dp)
                     ) {
                         Text(
-                            text = timezoneOptions.find { it.first.id == timezone.id }?.second ?: timezone.id,
+                            text = timezoneOptions.find { it.first.id == timezone.id }?.second
+                                ?: timezone.id,
                             fontSize = 14.sp,
                             color = Color.Black
                         )
@@ -188,13 +192,13 @@ fun UnixTimePage() {
                         )
                     }
                 }
-                
+
                 DropdownMenu(
                     expanded = showTimezoneDropdown,
                     onDismissRequest = { showTimezoneDropdown = false },
                     properties = PopupProperties(focusable = true),
 
-                ) {
+                    ) {
                     timezoneOptions.forEach { (tz, displayName) ->
                         DropdownMenuItem(
                             onClick = {
@@ -213,7 +217,7 @@ fun UnixTimePage() {
                 }
             }
         }
-        
+
         Spacer(modifier = Modifier.height(20.dp))
 
         // 时间戳转日期区域
@@ -290,13 +294,14 @@ fun UnixTimePage() {
                                         timestampErrorMessage = ""
                                     } catch (e: Exception) {
                                         timestampOutput = ""
-                                        timestampErrorMessage = StringResources.INVALID_TIMESTAMP_FORMAT
+                                        timestampErrorMessage =
+                                            StringResources.INVALID_TIMESTAMP_FORMAT
                                     }
                                 } else {
                                     timestampOutput = ""
                                 }
                             },
-                            text = "→",
+                            text = "→", textSize = 18.sp
                         )
                     }
                 }
@@ -327,7 +332,7 @@ fun UnixTimePage() {
                     )
                 }
             }
-            
+
             // 上面功能区的错误信息显示
             if (timestampErrorMessage.isNotEmpty()) {
                 Spacer(modifier = Modifier.height(16.dp))
@@ -418,7 +423,8 @@ fun UnixTimePage() {
                                                 dateOutput = date.time.toString()
                                                 dateErrorMessage = ""
                                             } else {
-                                                dateErrorMessage = StringResources.INVALID_DATE_FORMAT
+                                                dateErrorMessage =
+                                                    StringResources.INVALID_DATE_FORMAT
                                             }
                                         } catch (e: Exception) {
                                             dateErrorMessage = StringResources.INVALID_DATE_FORMAT
@@ -427,7 +433,7 @@ fun UnixTimePage() {
                                         dateOutput = ""
                                     }
                                 },
-                                text = "→",
+                                text = "→", textSize = 18.sp
                             )
                         }
                     }
