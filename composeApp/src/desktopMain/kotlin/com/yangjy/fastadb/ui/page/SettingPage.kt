@@ -15,6 +15,7 @@ import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.width
+import androidx.compose.foundation.layout.wrapContentHeight
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.text.BasicTextField
 import androidx.compose.material.Text
@@ -73,7 +74,7 @@ fun SettingsPage(lifecycleOwner: LifecycleOwner = LocalLifecycleOwner.current) {
 
     Box(modifier = Modifier.fillMaxWidth().fillMaxHeight()) {
         Column(modifier = Modifier.fillMaxWidth().fillMaxHeight()) {
-            Column(modifier = Modifier.weight(1f)) {
+            Column(modifier = Modifier.weight(1f).padding(bottom = 30.dp)) {
                 Text(
                     StringResources.SETTINGS_PAGE_TITLE,
                     fontSize = 30.sp,
@@ -81,7 +82,7 @@ fun SettingsPage(lifecycleOwner: LifecycleOwner = LocalLifecycleOwner.current) {
                     modifier = Modifier.padding(0.dp, 0.dp, 0.dp, 20.dp)
                 )
                 Column(modifier = Modifier.weight(1f)) {
-                    AndroidHomeSetting(lifecycleOwner, modifier = Modifier.weight(1f))
+                    AndroidHomeSetting(lifecycleOwner, modifier = Modifier.wrapContentHeight())
                     AdbConfigurationSetting(
                         lifecycleOwner = lifecycleOwner,
                         onSaveSuccess = {
@@ -92,9 +93,9 @@ fun SettingsPage(lifecycleOwner: LifecycleOwner = LocalLifecycleOwner.current) {
                             showToast = true
                             toastMessage = StringResources.ADB_COMMAND_SAVE_FAILED
                         },
-                        modifier = Modifier.weight(4f)
+                        modifier = Modifier.weight(1f)
                     )
-                    LanguageSetting(modifier = Modifier.weight(1f))
+                    LanguageSetting(modifier = Modifier.wrapContentHeight())
                 }
             }
         }
@@ -262,7 +263,7 @@ fun LanguageSetting(
             modifier = Modifier.padding(2.dp, 0.dp, 10.dp, 10.dp),
             textAlign = TextAlign.Start,
         )
-        Row {
+        Row() {
             // English Option
             Row(
                 verticalAlignment = Alignment.CenterVertically,
@@ -352,13 +353,13 @@ fun LanguageSetting(
                 Text(
                     text = "中文",
                     fontSize = 14.sp,
-                    modifier = Modifier.padding(start = 8.dp),
+                    modifier = Modifier.padding(start = 8.dp, bottom = 3.dp),
                     color = if (currentLanguage == StringResources.Language.CHINESE) ColorText else ColorTextGrayHint
                 )
             }
         }
         Text(
-            modifier = Modifier.weight(1f),
+            modifier = Modifier.wrapContentHeight(),
             color = ColorTextGrayHint,
             fontSize = 10.sp,
             text = StringResources.LANGUAGE_WILL_CHANGE_LATER

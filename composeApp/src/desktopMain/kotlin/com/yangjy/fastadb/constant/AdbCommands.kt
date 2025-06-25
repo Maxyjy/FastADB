@@ -99,7 +99,7 @@ object AdbCommands {
     /** 禁用 WiFi */
     const val ADB_WIFI_DISABLE = "adb shell svc wifi disable"
 
-    const val ADB_LIST_FILES = "adb shell 'cd $ADB_FILE_PATH_HOLDER && stat -c \"%F|%A|%h|%U|%G|%s|%Y|%n|%N\" *'"
+    const val ADB_LIST_FILES = "adb shell \"cd $ADB_FILE_PATH_HOLDER && stat -c %F\\|%A\\|%h\\|%U\\|%G\\|%s\\|%Y\\|%n\\|%N *\""
 
     const val ADB_DELETE_FILE = "adb shell rm $ADB_FILE_PATH_HOLDER"
     const val ADB_DELETE_DIR = "adb shell rm -rf $ADB_FILE_PATH_HOLDER"

@@ -156,11 +156,12 @@ fun AdbFileManagerPage(lifecycleOwner: LifecycleOwner = LocalLifecycleOwner.curr
             var foundDevice = false
             CommandExecutor.executeADB(
                 SettingsDelegate.getString(ANDROID_HOME_PATH),
-                AdbCommands.ADB_DEVICE_LIST,
+                AdbCommands.ADB_DEVICE_NAME,
                 object : CommandExecuteCallback {
                     override fun onInputPrint(line: String) {
+                        println("device scan - on input $line")
                         // 检查是否有设备连接
-                        if (line.contains("device") && !line.contains("List of devices attached")) {
+                        if (!line.contains("no devices")) {
                             foundDevice = true
                         }
                     }
@@ -179,6 +180,7 @@ fun AdbFileManagerPage(lifecycleOwner: LifecycleOwner = LocalLifecycleOwner.curr
                     }
 
                     override fun onErrorPrint(line: String) {
+                        println("device scan - on error $line")
                         // 只有在设备状态发生变化时才更新UI
                         if (previousDeviceState) {
                             hasConnectedDevices = false
