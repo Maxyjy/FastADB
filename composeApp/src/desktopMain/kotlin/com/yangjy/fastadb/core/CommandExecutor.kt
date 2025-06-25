@@ -21,7 +21,7 @@ object CommandExecutor {
             try {
                 // check Android Home environment
                 if (androidHomePath.isEmpty()) {
-                    callback.onErrorPrint("android path is empty, please relocate android home path")
+                    callback.onErrorPrint("android path is empty, please relocate adb path")
                     return@launch
                 }
                 val adbCommandLine = "$androidHomePath/$commandLine"
@@ -37,14 +37,14 @@ object CommandExecutor {
                 var line: String?
                 while ((reader.readLine().also { line = it }) != null) {
                     line?.let { callback.onInputPrint(it) }
-                    println("cmd print :$line")
+//                    println("cmd print :$line")
                 }
                 val errorReader = process.errorReader()
                 // read command output error
                 var errorLine: String?
                 while ((errorReader.readLine().also { errorLine = it }) != null) {
                     errorLine?.let { callback.onInputPrint(it) }
-                    println("cmd error :$errorLine")
+//                    println("cmd error :$errorLine")
                 }
                 // wait command line exit
                 val exitCode: Int = process.waitFor()

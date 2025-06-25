@@ -1,0 +1,9 @@
+<icon_code xmlns:android="http://schemas.android.com/apk/res/android"
+    android:width="24dp"
+    android:height="24dp"
+    android:viewportWidth="960"
+    android:viewportHeight="960">
+  <path
+      android:pathData="M320,706.15 L93.85,480 320,253.85l42.77,42.77 -184,184L362.15,664 320,706.15ZM640,706.15 L597.23,663.38 781.23,479.38L597.85,296 640,253.85 866.15,480 640,706.15Z"
+      android:fillColor="#000000"/>
+</icon_code>

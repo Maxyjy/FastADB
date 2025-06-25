@@ -24,18 +24,22 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.ColorFilter
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
+import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.TextUnit
 import androidx.compose.ui.unit.TextUnitType
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import com.yangjy.fastadb.constant.StringResources
 import com.yangjy.fastadb.getSystemName
 import fastadb.composeapp.generated.resources.Res
 import fastadb.composeapp.generated.resources.icon_adb
-import fastadb.composeapp.generated.resources.icon_apk
 import fastadb.composeapp.generated.resources.icon_app_logo_small
 import fastadb.composeapp.generated.resources.icon_base_64
+import fastadb.composeapp.generated.resources.icon_device_file_manager
+import fastadb.composeapp.generated.resources.icon_edit
 import fastadb.composeapp.generated.resources.icon_json_format
 import fastadb.composeapp.generated.resources.icon_settings
+import fastadb.composeapp.generated.resources.icon_time_zone
 import org.jetbrains.compose.resources.DrawableResource
 import org.jetbrains.compose.resources.painterResource
 import org.jetbrains.compose.ui.tooling.preview.Preview
@@ -71,17 +75,60 @@ fun SideBar(onIndexChangeListener: (Int) -> Unit) {
                 modifier = Modifier.height(55.dp).width(55.dp),
             )
         }
-        MenuItem(0, "ADB Execute", Res.drawable.icon_adb, onItemClickListener, selectedIndex)
-        MenuItem(1, "ADB Edit", Res.drawable.icon_apk, onItemClickListener, selectedIndex)
+        MenuItem(
+            0,
+            StringResources.ADB_EXECUTE_ITEM_TITLE,
+            Res.drawable.icon_adb,
+            onItemClickListener,
+            selectedIndex,
+            size = 20.dp
+        )
+        MenuItem(
+            1,
+            StringResources.ADB_EDIT_ITEM_TITLE,
+            Res.drawable.icon_edit,
+            onItemClickListener,
+            selectedIndex,
+            size = 20.dp
+        )
         MenuItem(
             2,
-            "Json Format",
+            StringResources.DEVICE_FILE_ITEM_TITLE,
+            Res.drawable.icon_device_file_manager,
+            onItemClickListener,
+            selectedIndex, size = 22.dp
+        )
+        MenuItem(
+            3,
+            StringResources.JSON_FORMAT_ITEM_TITLE,
             Res.drawable.icon_json_format,
             onItemClickListener,
-            selectedIndex
+            selectedIndex, size = 20.dp
         )
-        MenuItem(3, "Base64", Res.drawable.icon_base_64, onItemClickListener, selectedIndex)
-        MenuItem(4, "Settings", Res.drawable.icon_settings, onItemClickListener, selectedIndex)
+        MenuItem(
+            4,
+            StringResources.BASE64_ITEM_TITLE,
+            Res.drawable.icon_base_64,
+            onItemClickListener,
+            selectedIndex,
+            size = 20.dp
+        )
+        MenuItem(
+            5,
+            StringResources.TIMESTAMP_ITEM_TITLE,
+            Res.drawable.icon_time_zone,
+            onItemClickListener,
+            selectedIndex,
+            size = 22.dp
+        )
+        MenuItem(
+            6,
+            StringResources.SETTINGS_ITEM_TITLE,
+            Res.drawable.icon_settings,
+            onItemClickListener,
+            selectedIndex,
+            size = 22.dp
+        )
 
         Column(
             horizontalAlignment = Alignment.CenterHorizontally,
@@ -92,7 +139,7 @@ fun SideBar(onIndexChangeListener: (Int) -> Unit) {
                 "Fast ADB",
                 fontSize = 8.sp,
                 lineHeight = 8.sp,
-                color = ColorDisable,
+                color = ColorDisable.copy(alpha = 0.4f),
                 fontWeight = FontWeight(
                     if (getSystemName().contains("mac", true)) {
                         300
@@ -106,7 +153,7 @@ fun SideBar(onIndexChangeListener: (Int) -> Unit) {
                 "Developed by\n@YangJianyu",
                 fontSize = 6.sp,
                 lineHeight = 8.sp,
-                color = ColorDisable,
+                color = ColorDisable.copy(alpha = 0.4f),
                 fontWeight = FontWeight(
                     if (getSystemName().contains("mac", true)) {
                         300
@@ -127,7 +174,8 @@ fun MenuItem(
     icon: DrawableResource,
     onItemClickListener: (Int) -> Unit,
     selectedMenuItemIndex: Int,
-    enabled: Boolean = true
+    enabled: Boolean = true,
+    size: Dp = 20.dp
 ) {
     val isSelect = selectedMenuItemIndex == index
     fun onMenuClick(index: Int) {
@@ -154,7 +202,7 @@ fun MenuItem(
                 }, RoundedCornerShape(10)
             ).padding(vertical = 6.dp, horizontal = 0.dp),
     ) {
-        MenuIcon(icon, text, isSelect, enabled)
+        MenuIcon(icon, text, isSelect, enabled, size)
         MenuText(text, isSelect, enabled)
     }
 }
@@ -164,7 +212,8 @@ fun MenuIcon(
     icon: DrawableResource,
     contentDesc: String,
     isSelected: Boolean,
-    enabled: Boolean = true
+    enabled: Boolean = true,
+    size: Dp,
 ) {
     Image(
         painter = painterResource(icon),
@@ -180,7 +229,7 @@ fun MenuIcon(
                 ColorDisable
             }
         ),
-        modifier = Modifier.height(20.dp).width(20.dp),
+        modifier = Modifier.height(size).width(size),
     )
 }
 

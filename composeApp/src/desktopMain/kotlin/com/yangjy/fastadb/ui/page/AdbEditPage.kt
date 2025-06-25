@@ -12,6 +12,7 @@ import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.ExperimentalLayoutApi
 import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxHeight
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
@@ -40,6 +41,7 @@ import androidx.compose.ui.platform.LocalLifecycleOwner
 import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
+import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.TextUnit
 import androidx.compose.ui.unit.TextUnitType
 import androidx.compose.ui.unit.dp
@@ -51,6 +53,7 @@ import androidx.lifecycle.LifecycleOwner
 import com.yangjy.fastadb.constant.PlaceHolders.FILE_PATH_HOLDER
 import com.yangjy.fastadb.constant.PlaceHolders.MULTI_COMMAND_SPLIT
 import com.yangjy.fastadb.constant.PlaceHolders.PACKAGE_NAME_HOLDER
+import com.yangjy.fastadb.constant.StringResources
 import com.yangjy.fastadb.model.AdbShortcutGroupModel
 import com.yangjy.fastadb.model.AdbShortcutModel
 import com.yangjy.fastadb.ui.ColorDivider
@@ -108,7 +111,7 @@ fun GroupDropdown(
             verticalAlignment = Alignment.CenterVertically
         ) {
             Text(
-                text = selectedGroup?.title ?: "Select Group",
+                text = selectedGroup?.title ?: StringResources.SELECT_GROUP,
                 fontSize = 14.sp,
                 fontWeight = FontWeight(600),
                 color = if (selectedGroup == null) ColorTextSecondary else Color.Black,
@@ -118,7 +121,7 @@ fun GroupDropdown(
                 painter = painterResource(Res.drawable.icon_drop_down),
                 contentDescription = "dropdown",
                 modifier = Modifier
-                    .size(20.dp)
+                    .size(30.dp)
                     .rotate(if (expanded) 180f else 0f)
             )
         }
@@ -149,7 +152,10 @@ fun GroupDropdown(
                             color = if (group == selectedGroup) ColorTheme else Color.Black
                         )
                     }
-                    Box(modifier = Modifier.fillMaxWidth().height(DimenDivider).background(ColorDivider))
+                    Box(
+                        modifier = Modifier.fillMaxWidth().height(DimenDivider)
+                            .background(ColorDivider)
+                    )
                 }
 
                 // 添加新组的选项
@@ -170,7 +176,7 @@ fun GroupDropdown(
                         modifier = Modifier.size(20.dp)
                     )
                     Text(
-                        text = "Add New Group",
+                        text = StringResources.ADD_NEW_GROUP,
                         fontSize = 14.sp,
                         fontWeight = FontWeight(400),
                         color = ColorText,
@@ -302,7 +308,7 @@ fun AdbEditPage(lifecycleOwner: LifecycleOwner = LocalLifecycleOwner.current) {
 
     fun addNewGroup() {
         val newGroup = AdbShortcutGroupModel().apply {
-            title = "New Group"
+            title = StringResources.NEW_GROUP
             shortcuts = emptyList()
         }
         shortcutGroups = ArrayList(shortcutGroups).apply {
@@ -411,14 +417,16 @@ fun AdbEditPage(lifecycleOwner: LifecycleOwner = LocalLifecycleOwner.current) {
         Column(modifier = Modifier.wrapContentHeight()) {
 
             Text(
-                "Adb CommandLine Edit",
+                StringResources.EDIT_COMMAND_LINE_PAGE_TITLE,
+                maxLines = 1,
+                overflow = TextOverflow.Ellipsis,
                 fontSize = 30.sp,
                 fontWeight = FontWeight(700),
                 modifier = Modifier.padding(0.dp, 0.dp, 0.dp, 20.dp)
             )
 
             Text(
-                "CommandLine Group:",
+                StringResources.COMMANDLINE_GROUP,
                 fontSize = 15.sp,
                 fontWeight = FontWeight(500),
                 modifier = Modifier.padding(0.dp, 0.dp, 0.dp, 15.dp)
@@ -440,7 +448,7 @@ fun AdbEditPage(lifecycleOwner: LifecycleOwner = LocalLifecycleOwner.current) {
                     horizontalArrangement = Arrangement.End
                 ) {
                     TextButton(
-                        "Edit Title",
+                        StringResources.EDIT_TITLE,
                         textSize = 12.sp,
                         textColor = ColorEditable,
                         textPressedColor = ColorEditablePressed,
@@ -452,7 +460,7 @@ fun AdbEditPage(lifecycleOwner: LifecycleOwner = LocalLifecycleOwner.current) {
                     )
 
                     TextButton(
-                        "Delete Group",
+                        StringResources.DELETE_GROUP,
                         textSize = 12.sp,
                         textColor = ColorTheme,
                         textPressedColor = ColorThemePressed,
@@ -460,10 +468,12 @@ fun AdbEditPage(lifecycleOwner: LifecycleOwner = LocalLifecycleOwner.current) {
                         onClick = { showDeleteConfirmDialog = true }
                     )
                 }
+            } else {
+                Spacer(modifier = Modifier.height(30.dp))
             }
         }
         Text(
-            "CommandLine Subitem:",
+            StringResources.COMMANDLINE_SUBITEM,
             fontSize = 15.sp,
             fontWeight = FontWeight(500),
             modifier = Modifier.padding(0.dp, 0.dp, 0.dp, 15.dp)
@@ -490,7 +500,10 @@ fun AdbEditPage(lifecycleOwner: LifecycleOwner = LocalLifecycleOwner.current) {
                         onMoveUp = { adbShortcutModel -> moveShortcutUp(adbShortcutModel) },
                         onMoveDown = { adbShortcutModel -> moveShortcutDown(adbShortcutModel) }
                     )
-                    Box(modifier = Modifier.fillMaxWidth().height(DimenDivider).background(ColorDivider))
+                    Box(
+                        modifier = Modifier.fillMaxWidth().height(DimenDivider)
+                            .background(ColorDivider)
+                    )
                 }
                 NewAdbShortcutModelItem(
                     selectedGroup = selectedGroup,
@@ -683,14 +696,14 @@ fun AdbEditPage(lifecycleOwner: LifecycleOwner = LocalLifecycleOwner.current) {
                     .padding(20.dp)
             ) {
                 Text(
-                    text = "Delete Group",
+                    text = StringResources.DELETE_GROUP,
                     fontSize = 20.sp,
                     fontWeight = FontWeight.Bold,
                     modifier = Modifier.padding(bottom = 20.dp)
                 )
 
                 Text(
-                    text = "Are you sure you want to delete the group \"${selectedGroup?.title}\"?",
+                    text = "${StringResources.DELETE_GROUP_CONFIRM} \"${selectedGroup?.title}\"?",
                     fontSize = 16.sp,
                     color = ColorText,
                     modifier = Modifier.padding(bottom = 20.dp)
@@ -702,7 +715,7 @@ fun AdbEditPage(lifecycleOwner: LifecycleOwner = LocalLifecycleOwner.current) {
                     horizontalArrangement = Arrangement.End
                 ) {
                     TextButton(
-                        "Cancel",
+                        StringResources.CANCEL,
                         textSize = 16.sp,
                         textColor = ColorTextSecondary,
                         textPressedColor = ColorTextPressed,
@@ -710,7 +723,7 @@ fun AdbEditPage(lifecycleOwner: LifecycleOwner = LocalLifecycleOwner.current) {
                         onClick = { showDeleteConfirmDialog = false }
                     )
                     TextButton(
-                        "Delete",
+                        StringResources.DELETE,
                         textSize = 16.sp,
                         textColor = ColorTheme,
                         textPressedColor = ColorThemePressed,
@@ -961,7 +974,7 @@ fun AdbShortcutModelItem(
             verticalArrangement = Arrangement.Center
         ) {
             TextButton(
-                "Edit",
+                StringResources.EDIT,
                 textSize = 12.sp,
                 textColor = ColorEditable,
                 textPressedColor = ColorEditablePressed,
@@ -969,7 +982,7 @@ fun AdbShortcutModelItem(
                 onClick = { onEdit(shortcutModel) }
             )
             TextButton(
-                "Delete",
+                StringResources.DELETE,
                 textSize = 12.sp,
                 textColor = ColorTheme,
                 textPressedColor = ColorThemePressed,
@@ -993,7 +1006,7 @@ fun NewAdbShortcutModelItem(
             .clickable {
                 selectedGroup?.let {
                     val newShortcut = AdbShortcutModel().apply {
-                        name = "New CommandLine"
+                        name = StringResources.NEW_COMMANDLINE
                         commandLine = ""
                     }
                     onAddShortcut(newShortcut)
@@ -1011,7 +1024,7 @@ fun NewAdbShortcutModelItem(
                 modifier = Modifier.size(20.dp)
             )
             Text(
-                text = "Add New ADB CommandLine",
+                text = StringResources.ADD_NEW_COMMANDLINE,
                 fontWeight = FontWeight(500),
                 fontSize = TextUnit(14f, TextUnitType.Sp),
                 modifier = Modifier

@@ -1,5 +1,7 @@
 package com.yangjy.fastadb.constant
 
+import com.yangjy.fastadb.constant.PlaceHolders.ADB_FILE_NEW_PATH_HOLDER
+import com.yangjy.fastadb.constant.PlaceHolders.ADB_FILE_PATH_HOLDER
 import com.yangjy.fastadb.constant.PlaceHolders.DIR_PATH_HOLDER
 import com.yangjy.fastadb.constant.PlaceHolders.DISPLAY_ID_HOLDER
 import com.yangjy.fastadb.constant.PlaceHolders.FILE_PATH_HOLDER
@@ -96,4 +98,14 @@ object AdbCommands {
     const val ADB_WIFI_ENABLE = "adb shell svc wifi enable"
     /** 禁用 WiFi */
     const val ADB_WIFI_DISABLE = "adb shell svc wifi disable"
-} 
+
+    const val ADB_LIST_FILES = "adb shell \"cd $ADB_FILE_PATH_HOLDER && stat -c %F\\|%A\\|%h\\|%U\\|%G\\|%s\\|%Y\\|%n\\|%N *\""
+
+    const val ADB_DELETE_FILE = "adb shell rm $ADB_FILE_PATH_HOLDER"
+    const val ADB_DELETE_DIR = "adb shell rm -rf $ADB_FILE_PATH_HOLDER"
+
+    const val ADB_PULL = "adb pull $ADB_FILE_PATH_HOLDER '$FILE_PATH_HOLDER'"
+    const val ADB_PUSH = "adb push '$FILE_PATH_HOLDER' $ADB_FILE_PATH_HOLDER"
+
+    const val ADB_MV = "adb shell mv '$ADB_FILE_PATH_HOLDER' '$ADB_FILE_NEW_PATH_HOLDER'"
+}

@@ -15,6 +15,7 @@ import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.width
+import androidx.compose.foundation.layout.wrapContentHeight
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.text.BasicTextField
 import androidx.compose.material.Text
@@ -36,7 +37,12 @@ import androidx.compose.ui.unit.sp
 import androidx.lifecycle.Lifecycle
 import androidx.lifecycle.LifecycleEventObserver
 import androidx.lifecycle.LifecycleOwner
+import com.yangjy.fastadb.constant.AdbCommandData
+import com.yangjy.fastadb.constant.AdbCommands
+import com.yangjy.fastadb.constant.StringResources
+import com.yangjy.fastadb.model.AdbShortcutGroupModel
 import com.yangjy.fastadb.ui.ColorDivider
+import com.yangjy.fastadb.ui.ColorText
 import com.yangjy.fastadb.ui.ColorTheme
 import com.yangjy.fastadb.ui.DimenDivider
 import com.yangjy.fastadb.ui.RoundedCorner
@@ -44,10 +50,15 @@ import com.yangjy.fastadb.ui.ColorTextGrayHint
 import com.yangjy.fastadb.ui.componects.ThemeButton
 import com.yangjy.fastadb.ui.componects.ToastHost
 import com.yangjy.fastadb.utils.AppPreferencesKey
+import com.yangjy.fastadb.utils.AppPreferencesKey.ADB_CONFIGURATION
 import com.yangjy.fastadb.utils.AppPreferencesKey.ANDROID_HOME_PATH
+import com.yangjy.fastadb.utils.AppPreferencesKey.LANGUAGE
+import com.yangjy.fastadb.utils.JsonFormatUtil
 import com.yangjy.fastadb.utils.SettingsDelegate
 import fastadb.composeapp.generated.resources.Res
 import fastadb.composeapp.generated.resources.icon_folder
+import fastadb.composeapp.generated.resources.icon_check_box_checked
+import fastadb.composeapp.generated.resources.icon_check_box_uncheck
 import io.github.vinceglb.filekit.compose.rememberDirectoryPickerLauncher
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
@@ -63,21 +74,29 @@ fun SettingsPage(lifecycleOwner: LifecycleOwner = LocalLifecycleOwner.current) {
 
     Box(modifier = Modifier.fillMaxWidth().fillMaxHeight()) {
         Column(modifier = Modifier.fillMaxWidth().fillMaxHeight()) {
-            Column(modifier = Modifier.weight(1f)) {
+            Column(modifier = Modifier.weight(1f).padding(bottom = 30.dp)) {
                 Text(
-                    "Settings",
+                    StringResources.SETTINGS_PAGE_TITLE,
                     fontSize = 30.sp,
                     fontWeight = FontWeight(700),
                     modifier = Modifier.padding(0.dp, 0.dp, 0.dp, 20.dp)
                 )
-                AndroidHomeSetting(lifecycleOwner)
-                AdbConfigurationSetting(
-                    lifecycleOwner = lifecycleOwner,
-                    onSaveSuccess = {
-                        showToast = true
-                        toastMessage = "Adb Commands saved successfully"
-                    }
-                )
+                Column(modifier = Modifier.weight(1f)) {
+                    AndroidHomeSetting(lifecycleOwner, modifier = Modifier.wrapContentHeight())
+                    AdbConfigurationSetting(
+                        lifecycleOwner = lifecycleOwner,
+                        onSaveSuccess = {
+                            showToast = true
+                            toastMessage = StringResources.ADB_COMMAND_SAVE_SUCCESS
+                        },
+                        onSaveFailed = {
+                            showToast = true
+                            toastMessage = StringResources.ADB_COMMAND_SAVE_FAILED
+                        },
+                        modifier = Modifier.weight(1f)
+                    )
+                    LanguageSetting(modifier = Modifier.wrapContentHeight())
+                }
             }
         }
 
@@ -94,12 +113,12 @@ fun SettingsPage(lifecycleOwner: LifecycleOwner = LocalLifecycleOwner.current) {
 }
 
 @Composable
-fun AndroidHomeSetting(lifecycleOwner: LifecycleOwner) {
+fun AndroidHomeSetting(lifecycleOwner: LifecycleOwner, modifier: Modifier = Modifier) {
 
     var androidHomePath by remember { mutableStateOf("") }
 
     val androidHomePathPickLauncher = rememberDirectoryPickerLauncher(
-        title = "Pick Android Home Path",
+        title = StringResources.PICK_ANDROID_HOME_PATH,
     ) { directory ->
         CoroutineScope(Dispatchers.Default).launch {
             println(directory?.path)
@@ -107,7 +126,7 @@ fun AndroidHomeSetting(lifecycleOwner: LifecycleOwner) {
             path?.let {
                 if (it.isNotEmpty()) {
                     androidHomePath = it
-                    SettingsDelegate.putString(ANDROID_HOME_PATH,it)
+                    SettingsDelegate.putString(ANDROID_HOME_PATH, it)
                 }
             }
         }
@@ -130,86 +149,230 @@ fun AndroidHomeSetting(lifecycleOwner: LifecycleOwner) {
         }
     }
 
-    Text(
-        text = "Android Home Path :",
-        fontSize = 14.sp,
-        modifier = Modifier.padding(2.dp, 0.dp, 0.dp, 10.dp),
-        textAlign = TextAlign.Start,
-    )
-    Row(
-        verticalAlignment = Alignment.CenterVertically,
-        modifier = Modifier.fillMaxWidth(1f)
-            .height(55.dp)
-            .padding(0.dp, 0.dp, 0.dp, 0.dp)
-            .border(
-                DimenDivider,
-                color = ColorDivider,
-                shape = RoundedCornerShape(RoundedCorner)
-            ).background(
-                Color.White,
-                RoundedCornerShape(RoundedCorner)
-            )
-    ) {
-        BasicTextField(
-            value = if (androidHomePath == "null") {
-                ""
-            } else {
-                androidHomePath
-            },
-            onValueChange = {
-                androidHomePath = it
-                CoroutineScope(Dispatchers.Default).launch {
-                    SettingsDelegate.putString(
-                        ANDROID_HOME_PATH, androidHomePath
-                    )
-                }
-            },
-            modifier = Modifier.weight(1f)
-                .padding(start = 15.dp, top = 10.dp, end = 15.dp, bottom = 10.dp)
+    Column(modifier = modifier) {
+        Text(
+            text = StringResources.ANDROID_HOME_PATH,
+            fontSize = 14.sp,
+            fontWeight = FontWeight(500),
+            modifier = Modifier.padding(2.dp, 0.dp, 0.dp, 10.dp),
+            textAlign = TextAlign.Start,
         )
-        Column(
-            modifier = Modifier.fillMaxHeight(),
-            verticalArrangement = Arrangement.Center
+        Row(
+            verticalAlignment = Alignment.CenterVertically,
+            modifier = Modifier.fillMaxWidth(1f)
+                .height(55.dp)
+                .padding(0.dp, 0.dp, 0.dp, 0.dp)
+                .border(
+                    DimenDivider,
+                    color = ColorDivider,
+                    shape = RoundedCornerShape(RoundedCorner)
+                ).background(
+                    Color.White,
+                    RoundedCornerShape(RoundedCorner)
+                )
         ) {
-            val interactionSource = remember { MutableInteractionSource() }
-            val isPressed by interactionSource.collectIsPressedAsState()
-
-            Image(
-                painter = painterResource(Res.drawable.icon_folder),
-                "pick file",
-                colorFilter = ColorFilter.tint(
-                    ColorTheme
-                ),
-                modifier = Modifier.padding(end = 8.dp)
-                    .height(26.dp)
-                    .width(26.dp).clickable(
-                        interactionSource = interactionSource,
-                        indication = null
-                    ) {
-                        androidHomePathPickLauncher.launch()
+            BasicTextField(
+                value = if (androidHomePath == "null") {
+                    ""
+                } else {
+                    androidHomePath
+                },
+                onValueChange = {
+                    androidHomePath = it
+                    CoroutineScope(Dispatchers.Default).launch {
+                        SettingsDelegate.putString(
+                            ANDROID_HOME_PATH, androidHomePath
+                        )
                     }
-                    .background(
-                        if (isPressed) ColorTheme.copy(alpha = 0.1f) else Color.White,
-                        RoundedCornerShape(4.dp)
-                    ).padding(3.dp)
+                },
+                modifier = Modifier.weight(1f)
+                    .padding(start = 15.dp, top = 10.dp, end = 15.dp, bottom = 10.dp)
             )
+            Column(
+                modifier = Modifier.fillMaxHeight(),
+                verticalArrangement = Arrangement.Center
+            ) {
+                val interactionSource = remember { MutableInteractionSource() }
+                val isPressed by interactionSource.collectIsPressedAsState()
+
+                Image(
+                    painter = painterResource(Res.drawable.icon_folder),
+                    "pick file",
+                    colorFilter = ColorFilter.tint(
+                        ColorTheme
+                    ),
+                    modifier = Modifier.padding(end = 8.dp)
+                        .height(26.dp)
+                        .width(26.dp).clickable(
+                            interactionSource = interactionSource,
+                            indication = null
+                        ) {
+                            androidHomePathPickLauncher.launch()
+                        }
+                        .background(
+                            if (isPressed) ColorTheme.copy(alpha = 0.1f) else Color.White,
+                            RoundedCornerShape(4.dp)
+                        ).padding(3.dp)
+                )
+            }
+        }
+        Text(
+            modifier = Modifier.padding(
+                top = 5.dp, bottom = 10.dp, end = 10.dp
+            ),
+            fontSize = 10.sp,
+            textAlign = TextAlign.Center,
+            text = StringResources.ANDROID_HOME_PATH_EXAMPLE,
+            color = ColorTextGrayHint
+        )
+    }
+}
+
+@Composable
+fun LanguageSetting(
+    lifecycleOwner: LifecycleOwner = LocalLifecycleOwner.current,
+    modifier: Modifier = Modifier,
+) {
+    var currentLanguage by remember { mutableStateOf(StringResources.getCurrentLanguage()) }
+
+    DisposableEffect(key1 = lifecycleOwner) {
+        val observer = LifecycleEventObserver { _, event ->
+            if (event == Lifecycle.Event.ON_START) {
+                CoroutineScope(Dispatchers.Default).launch {
+                    val savedLanguage = SettingsDelegate.getString(LANGUAGE)
+                    currentLanguage = when (savedLanguage) {
+                        "ENGLISH" -> StringResources.Language.ENGLISH
+                        "CHINESE" -> StringResources.Language.CHINESE
+                        else -> StringResources.Language.ENGLISH
+                    }
+                    StringResources.setLanguage(currentLanguage)
+                }
+            }
+        }
+        lifecycleOwner.lifecycle.addObserver(observer)
+        onDispose {
+            lifecycleOwner.lifecycle.removeObserver(observer)
         }
     }
-    Text(
-        modifier = Modifier.padding(
-            top = 5.dp, bottom = 10.dp, start = 10.dp, end = 10.dp
-        ),
-        fontSize = 10.sp,
-        textAlign = TextAlign.Center,
-        text = "e.g. '/Users/max/Library/Android/sdk/platform-tools' ,Make sure there is 'adb' under your path",
-        color = ColorTextGrayHint
-    )
+
+    Column(modifier = modifier) {
+        Text(
+            text = StringResources.LANGUAGE,
+            fontSize = 14.sp,
+            fontWeight = FontWeight(500),
+            modifier = Modifier.padding(2.dp, 0.dp, 10.dp, 10.dp),
+            textAlign = TextAlign.Start,
+        )
+        Row() {
+            // English Option
+            Row(
+                verticalAlignment = Alignment.CenterVertically,
+                modifier = Modifier.height(30.dp).clickable {
+                    currentLanguage = StringResources.Language.ENGLISH
+                    StringResources.setLanguage(StringResources.Language.ENGLISH)
+                    CoroutineScope(Dispatchers.Default).launch {
+                        var isDefaultStaySame = false
+                        if (SettingsDelegate.getString(ADB_CONFIGURATION) == JsonFormatUtil.formatShortcutGroups(
+                                AdbCommandData.getDefault()
+                            )
+                        ) {
+                            isDefaultStaySame = true
+                            SettingsDelegate.putString(ADB_CONFIGURATION, "")
+                        }
+                        SettingsDelegate.putString(LANGUAGE, "ENGLISH")
+                        if (isDefaultStaySame) {
+                            SettingsDelegate.putString(
+                                ADB_CONFIGURATION, JsonFormatUtil.formatShortcutGroups(
+                                    AdbCommandData.getDefault()
+                                )
+                            )
+                        }
+                    }
+                }.padding(horizontal = 5.dp)
+            ) {
+                Image(
+                    painter = painterResource(
+                        if (currentLanguage == StringResources.Language.ENGLISH)
+                            Res.drawable.icon_check_box_checked
+                        else
+                            Res.drawable.icon_check_box_uncheck
+                    ),
+                    contentDescription = "English checkbox",
+                    colorFilter = ColorFilter.tint(
+                        if (currentLanguage == StringResources.Language.ENGLISH) ColorTheme else ColorTextGrayHint
+                    ),
+                    modifier = Modifier.height(24.dp).width(24.dp)
+                )
+                Text(
+                    text = "English",
+                    fontSize = 14.sp,
+                    modifier = Modifier.padding(start = 8.dp, bottom = 5.dp),
+                    color = if (currentLanguage == StringResources.Language.ENGLISH) ColorText else ColorTextGrayHint
+                )
+            }
+
+            // Chinese Option
+            Row(
+                verticalAlignment = Alignment.CenterVertically,
+                modifier = Modifier.height(30.dp).padding(start = 10.dp).clickable {
+                    currentLanguage = StringResources.Language.CHINESE
+                    StringResources.setLanguage(StringResources.Language.CHINESE)
+                    CoroutineScope(Dispatchers.Default).launch {
+                        var isDefaultStaySame = false
+                        if (SettingsDelegate.getString(ADB_CONFIGURATION) == JsonFormatUtil.formatShortcutGroups(
+                                AdbCommandData.getDefault()
+                            )
+                        ) {
+                            isDefaultStaySame = true
+                            SettingsDelegate.putString(ADB_CONFIGURATION, "")
+                        }
+                        SettingsDelegate.putString(LANGUAGE, "CHINESE")
+                        if (isDefaultStaySame) {
+                            SettingsDelegate.putString(
+                                ADB_CONFIGURATION, JsonFormatUtil.formatShortcutGroups(
+                                    AdbCommandData.getDefault()
+                                )
+                            )
+                        }
+                    }
+                }.padding(horizontal = 5.dp)
+            ) {
+                Image(
+                    painter = painterResource(
+                        if (currentLanguage == StringResources.Language.CHINESE)
+                            Res.drawable.icon_check_box_checked
+                        else
+                            Res.drawable.icon_check_box_uncheck
+                    ),
+                    contentDescription = "Chinese checkbox",
+                    colorFilter = ColorFilter.tint(
+                        if (currentLanguage == StringResources.Language.CHINESE) ColorTheme else ColorTextGrayHint
+                    ),
+                    modifier = Modifier.height(24.dp).width(24.dp)
+                )
+                Text(
+                    text = "中文",
+                    fontSize = 14.sp,
+                    modifier = Modifier.padding(start = 8.dp, bottom = 3.dp),
+                    color = if (currentLanguage == StringResources.Language.CHINESE) ColorText else ColorTextGrayHint
+                )
+            }
+        }
+        Text(
+            modifier = Modifier.wrapContentHeight(),
+            color = ColorTextGrayHint,
+            fontSize = 10.sp,
+            text = StringResources.LANGUAGE_WILL_CHANGE_LATER
+        )
+    }
 }
 
 @Composable
 fun AdbConfigurationSetting(
     lifecycleOwner: LifecycleOwner,
-    onSaveSuccess: () -> Unit
+    onSaveSuccess: () -> Unit,
+    onSaveFailed: () -> Unit,
+    modifier: Modifier = Modifier
 ) {
     var configurationJson by remember { mutableStateOf("") }
     var tempConfigurationJson by remember { mutableStateOf("") }
@@ -220,7 +383,7 @@ fun AdbConfigurationSetting(
                 CoroutineScope(Dispatchers.Default).launch {
                     configurationJson =
                         SettingsDelegate.getString(
-                            AppPreferencesKey.ADB_CONFIGURATION
+                            ADB_CONFIGURATION
                         )
                     tempConfigurationJson = configurationJson
                 }
@@ -232,64 +395,73 @@ fun AdbConfigurationSetting(
         }
     }
 
-    Text(
-        text = "ADB Commands Configuration Json:",
-        fontSize = 14.sp,
-        modifier = Modifier.padding(2.dp, 0.dp, 0.dp, 10.dp),
-        textAlign = TextAlign.Start,
-    )
-    Column(
-        modifier = Modifier.fillMaxWidth(1f)
-            .fillMaxHeight()
-            .padding(0.dp, 0.dp, 0.dp, 10.dp)
-    ) {
-        Row(
-            verticalAlignment = Alignment.CenterVertically,
-            modifier = Modifier.fillMaxWidth()
+    Column(modifier = modifier) {
+        Text(
+            text = StringResources.ADB_COMMANDS_CONFIGURATION_JSON,
+            fontSize = 14.sp,
+            fontWeight = FontWeight(500),
+            modifier = Modifier.padding(2.dp, 0.dp, 0.dp, 10.dp),
+            textAlign = TextAlign.Start,
+        )
+        Column(
+            modifier = Modifier.fillMaxWidth(1f)
                 .weight(1f)
-                .border(
-                    DimenDivider,
-                    color = ColorDivider,
-                    shape = RoundedCornerShape(RoundedCorner)
-                ).background(
-                    Color.White,
-                    RoundedCornerShape(RoundedCorner)
-                )
+                .padding(0.dp, 0.dp, 0.dp, 10.dp)
         ) {
-            BasicTextField(
-                value = if (tempConfigurationJson == "null") {
-                    ""
-                } else {
-                    tempConfigurationJson
-                },
-                onValueChange = {
-                    tempConfigurationJson = it
-                },
-                modifier = Modifier.fillMaxWidth().fillMaxHeight()
-                    .padding(start = 15.dp, top = 10.dp, end = 15.dp, bottom = 10.dp)
-            )
-        }
-
-        Row(
-            modifier = Modifier.fillMaxWidth().padding(top = 10.dp, bottom = 10.dp),
-            horizontalArrangement = Arrangement.End,
-            verticalAlignment = Alignment.CenterVertically
-        ) {
-            Text(
-                modifier = Modifier.weight(1f),
-                color = ColorTextGrayHint,
-                fontSize = 10.sp,
-                text = "Copy the JSON to share your ADB Commands with others.\nOr input a JSON to convert it into ADB Commands."
-            )
-            ThemeButton(onClick = {
-                configurationJson = tempConfigurationJson
-                CoroutineScope(Dispatchers.Default).launch {
-                    SettingsDelegate.putString(
-                        AppPreferencesKey.ADB_CONFIGURATION, configurationJson
+            Row(
+                verticalAlignment = Alignment.CenterVertically,
+                modifier = Modifier.fillMaxWidth()
+                    .weight(1f)
+                    .border(
+                        DimenDivider,
+                        color = ColorDivider,
+                        shape = RoundedCornerShape(RoundedCorner)
+                    ).background(
+                        Color.White,
+                        RoundedCornerShape(RoundedCorner)
                     )
-                    onSaveSuccess()
-                }
-            }, "Convert JSON to ADB commands")
+            ) {
+                BasicTextField(
+                    value = if (tempConfigurationJson == "null") {
+                        ""
+                    } else {
+                        tempConfigurationJson
+                    },
+                    onValueChange = {
+                        tempConfigurationJson = it
+                    },
+                    modifier = Modifier.fillMaxWidth().fillMaxHeight()
+                        .padding(start = 15.dp, top = 10.dp, end = 15.dp, bottom = 10.dp)
+                )
+            }
+
+            Row(
+                modifier = Modifier.fillMaxWidth().padding(top = 10.dp, bottom = 10.dp),
+                horizontalArrangement = Arrangement.End,
+                verticalAlignment = Alignment.CenterVertically
+            ) {
+                Text(
+                    modifier = Modifier.weight(1f),
+                    color = ColorTextGrayHint,
+                    fontSize = 10.sp,
+                    text = StringResources.COPY_JSON_SHARE_MESSAGE
+                )
+                ThemeButton(onClick = {
+                    configurationJson = tempConfigurationJson
+                    CoroutineScope(Dispatchers.Default).launch {
+                        val shortcutGroups =
+                            JsonFormatUtil.parseShortcutGroups(configurationJson) as ArrayList<AdbShortcutGroupModel>
+                        if (shortcutGroups.isNotEmpty()) {
+                            SettingsDelegate.putString(
+                                ADB_CONFIGURATION, configurationJson
+                            )
+                            onSaveSuccess()
+                        } else {
+                            onSaveFailed()
+                        }
+                    }
+                }, StringResources.CONVERT_JSON_TO_ADB_COMMANDS)
+            }
         }
     }
 }

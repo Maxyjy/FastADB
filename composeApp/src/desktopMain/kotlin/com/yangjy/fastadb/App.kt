@@ -22,9 +22,11 @@ import com.yangjy.fastadb.ui.DimenDivider
 import com.yangjy.fastadb.ui.SideBar
 import com.yangjy.fastadb.ui.page.AboutPage
 import com.yangjy.fastadb.ui.page.AdbEditPage
+import com.yangjy.fastadb.ui.page.AdbFileManagerPage
 import com.yangjy.fastadb.ui.page.JsonFormatPage
 import com.yangjy.fastadb.ui.page.SettingsPage
 import com.yangjy.fastadb.ui.page.Base64Page
+import com.yangjy.fastadb.ui.page.UnixTimePage
 import org.jetbrains.compose.ui.tooling.preview.Preview
 
 
@@ -65,14 +67,22 @@ fun App(lifecycleOwner: LifecycleOwner = LocalLifecycleOwner.current) {
                     }
 
                     2 -> {
-                        JsonFormatPage()
+                        AdbFileManagerPage()
                     }
 
                     3 -> {
-                        Base64Page()
+                        JsonFormatPage()
                     }
 
                     4 -> {
+                        Base64Page()
+                    }
+
+                    5 -> {
+                        UnixTimePage()
+                    }
+
+                    6 -> {
                         SettingsPage()
                     }
 

@@ -30,6 +30,7 @@ import com.yangjy.fastadb.ui.DimenDivider
 import com.yangjy.fastadb.ui.RoundedCorner
 import com.yangjy.fastadb.ui.componects.ThemeButton
 import com.yangjy.fastadb.utils.Base64Util
+import com.yangjy.fastadb.constant.StringResources
 import org.jetbrains.compose.ui.tooling.preview.Preview
 
 /**
@@ -48,7 +49,7 @@ fun Base64Page() {
         modifier = Modifier.fillMaxWidth()
     ) {
         Text(
-            "Base64 Encode / Decode",
+            StringResources.BASE64_ENCODE_DECODE,
             fontSize = 30.sp,
             fontWeight = FontWeight(600),
             modifier = Modifier.padding(0.dp, 0.dp, 0.dp, 20.dp)
@@ -69,7 +70,7 @@ fun Base64Page() {
             // 输入部分
             Column {
                 Text(
-                    "Content:",
+                    StringResources.CONTENT,
                     fontSize = 16.sp,
                     fontWeight = FontWeight.Medium,
                     modifier = Modifier.padding(bottom = 8.dp)
@@ -87,7 +88,7 @@ fun Base64Page() {
                 )
 
                 Text(
-                    text = "Enter content for both encoding and decoding",
+                    text = StringResources.ENTER_CONTENT_HINT,
                     color = Color.Gray,
                     fontSize = 12.sp,
                     modifier = Modifier.padding(top = 8.dp)
@@ -110,7 +111,7 @@ fun Base64Page() {
                             }
                         }
                     },
-                    text = "Encode",
+                    text = StringResources.ENCODE,
                 )
                 Spacer(modifier = Modifier.width(10.dp))
                 ThemeButton(
@@ -123,7 +124,7 @@ fun Base64Page() {
                             }
                         }
                     },
-                    text = "Decode"
+                    text = StringResources.DECODE
                 )
             }
             // 分割线
@@ -136,7 +137,7 @@ fun Base64Page() {
             // 输出部分
             Column {
                 Text(
-                    "Result :",
+                    StringResources.RESULT,
                     fontSize = 16.sp,
                     fontWeight = FontWeight.Medium,
                     modifier = Modifier.padding(bottom = 8.dp)

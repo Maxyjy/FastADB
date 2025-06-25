@@ -23,6 +23,7 @@ import androidx.compose.ui.text.font.FontStyle
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.text.style.TextOverflow
+import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.TextUnit
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
@@ -103,7 +104,13 @@ fun SecondaryThemeButton(onClick: () -> Unit, text: String, enable: Boolean = tr
 
 
 @Composable
-fun ThemeButton(onClick: () -> Unit, text: String, enable: Boolean = true) {
+fun ThemeButton(
+    onClick: () -> Unit,
+    text: String,
+    enable: Boolean = true,
+    textSize: TextUnit = 14.sp,
+    modifier: Modifier = Modifier
+) {
     Button(
         elevation = ButtonDefaults.elevation(
             defaultElevation = 0.dp,
@@ -118,19 +125,21 @@ fun ThemeButton(onClick: () -> Unit, text: String, enable: Boolean = true) {
             ColorTheme,
             contentColor = Color.White,
         ),
+        modifier = modifier,
         onClick = {
             onClick.invoke()
         }) {
-        ThemeText(text)
+        ThemeText(text, textSize)
     }
 }
 
 @Composable
-fun ThemeText(text: String) {
+fun ThemeText(text: String, textSize: TextUnit) {
     Text(
         fontWeight = FontWeight(400),
         fontStyle = FontStyle.Normal,
         letterSpacing = 0.5.sp,
+        fontSize = textSize,
         fontFamily = FontFamily.Default,
         text = text,
         maxLines = 1,
