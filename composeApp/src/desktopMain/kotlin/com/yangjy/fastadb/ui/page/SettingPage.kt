@@ -241,7 +241,8 @@ fun LanguageSetting(
                     val savedLanguage = SettingsDelegate.getString(LANGUAGE)
                     currentLanguage = when (savedLanguage) {
                         "ENGLISH" -> StringResources.Language.ENGLISH
-                        else -> StringResources.Language.CHINESE
+                        "CHINESE" -> StringResources.Language.CHINESE
+                        else -> StringResources.Language.ENGLISH
                     }
                     StringResources.setLanguage(currentLanguage)
                 }

@@ -22,7 +22,8 @@ object AdbCommandData {
         val currentLanguage = SettingsDelegate.getString(LANGUAGE)
         return when (currentLanguage) {
             "ENGLISH" -> getEnglishDefaultConfig()
-            else -> getChineseDefaultConfig()
+            "CHINESE" -> getChineseDefaultConfig()
+            else -> getEnglishDefaultConfig()
         }
     }
 

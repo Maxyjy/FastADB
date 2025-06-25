@@ -17,21 +17,19 @@ object SettingsDelegate : AppPreferences {
         Settings()
     }
 
-    override suspend fun getString(key: String): String {
+    override fun getString(key: String): String {
         return settings[key] ?: ""
     }
 
-    override suspend fun putString(key: String, value: String) {
+    override fun putString(key: String, value: String) {
         settings.putString(key, value)
     }
 
 }
 
-internal const val SETTINGS_PREFERENCES = "settings_preferences.preferences_pb"
-
 interface AppPreferences {
-    suspend fun getString(key: String): String?
-    suspend fun putString(key: String, value: String)
+    fun getString(key: String): String?
+    fun putString(key: String, value: String)
 }
 
 object AppPreferencesKey {
