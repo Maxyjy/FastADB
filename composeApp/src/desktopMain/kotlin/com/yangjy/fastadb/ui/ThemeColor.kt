@@ -26,6 +26,12 @@ val ColorTextGrayHint = Color(0xCC6B6B6B)
 val ColorEditable = Color(0xCC000000)
 val ColorEditablePressed = Color(0xCC949494)
 val ColorMoveUpDownIcon = Color(0xCCDEDEDE)
+
+// 新增颜色定义
+val ColorPrimary = Color(0xFF2196F3)
+val ColorError = Color(0xFFF44336)
+val ColorSuccess = Color(0xFF4CAF50)
+
 val DimenDivider = 0.5.dp
 val RoundedCorner = 8.dp
 val ButtonRoundedCorner = 6.dp

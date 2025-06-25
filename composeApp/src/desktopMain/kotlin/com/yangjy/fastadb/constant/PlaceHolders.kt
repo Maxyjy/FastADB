@@ -17,5 +17,8 @@ object PlaceHolders {
     const val SPACE_HOLDER = "{SPACE_HOLDER}"
     const val TIME_STAMP_HOLDER = "{TIME_STAMP_HOLDER}"
     const val MULTI_COMMAND_SPLIT = "{&&}"
+    const val ADB_FILE_PATH_HOLDER = "{ADB_FILE_PATH_HOLDER}"
+    const val ADB_FILE_NEW_PATH_HOLDER = "{ADB_FILE_NEW_PATH_HOLDER}"
+
 
 }

@@ -5,10 +5,14 @@ import androidx.compose.foundation.border
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.text.BasicTextField
+import androidx.compose.material.Divider
 import androidx.compose.material.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
@@ -26,6 +30,7 @@ import com.yangjy.fastadb.ui.DimenDivider
 import com.yangjy.fastadb.ui.RoundedCorner
 import com.yangjy.fastadb.ui.componects.ThemeButton
 import com.yangjy.fastadb.utils.Base64Util
+import com.yangjy.fastadb.constant.StringResources
 import org.jetbrains.compose.ui.tooling.preview.Preview
 
 /**
@@ -37,91 +42,118 @@ import org.jetbrains.compose.ui.tooling.preview.Preview
 @Composable
 @Preview
 fun Base64Page() {
-    var encodeText by remember { mutableStateOf("") }
-    var decodeText by remember { mutableStateOf("") }
-    Column {
+    var inputText by remember { mutableStateOf("") }
+    var outputText by remember { mutableStateOf("") }
+
+    Column(
+        modifier = Modifier.fillMaxWidth()
+    ) {
         Text(
-            "Base64 Encode / Decode",
+            StringResources.BASE64_ENCODE_DECODE,
             fontSize = 30.sp,
             fontWeight = FontWeight(600),
-            modifier = Modifier.padding(0.dp, 0.dp, 0.dp, 10.dp)
+            modifier = Modifier.padding(0.dp, 0.dp, 0.dp, 20.dp)
         )
-        Column {
-            Column(
-                modifier = Modifier.fillMaxWidth(),
+
+        // 主容器 - 圆角矩形
+        Column(
+            modifier = Modifier
+                .fillMaxWidth()
+                .background(Color.White, RoundedCornerShape(12.dp))
+                .border(
+                    DimenDivider,
+                    color = ColorDivider,
+                    shape = RoundedCornerShape(12.dp)
+                )
+                .padding(16.dp)
+        ) {
+            // 输入部分
+            Column {
+                Text(
+                    StringResources.CONTENT,
+                    fontSize = 16.sp,
+                    fontWeight = FontWeight.Medium,
+                    modifier = Modifier.padding(bottom = 8.dp)
+                )
+                BasicTextField(
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .background(Color.LightGray.copy(alpha = 0.1f), RoundedCornerShape(8.dp))
+                        .padding(12.dp)
+                        .height(100.dp),
+                    value = inputText,
+                    onValueChange = {
+                        inputText = it
+                    }
+                )
+
+                Text(
+                    text = StringResources.ENTER_CONTENT_HINT,
+                    color = Color.Gray,
+                    fontSize = 12.sp,
+                    modifier = Modifier.padding(top = 8.dp)
+                )
+            }
+            // 按钮区域 - 靠右排列
+            Row(
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .padding(top = 16.dp),
+                horizontalArrangement = Arrangement.End
             ) {
+                ThemeButton(
+                    onClick = {
+                        if (inputText.isNotEmpty()) {
+                            try {
+                                outputText = Base64Util.base64Encode(inputText)
+                            } catch (e: Exception) {
+                                println(e.message)
+                            }
+                        }
+                    },
+                    text = StringResources.ENCODE,
+                )
+                Spacer(modifier = Modifier.width(10.dp))
+                ThemeButton(
+                    onClick = {
+                        if (inputText.isNotEmpty()) {
+                            try {
+                                outputText = Base64Util.base64Decode(inputText).toString()
+                            } catch (e: Exception) {
+                                println(e.message)
+                            }
+                        }
+                    },
+                    text = StringResources.DECODE
+                )
+            }
+            // 分割线
+            Divider(
+                modifier = Modifier.padding(vertical = 16.dp),
+                color = ColorDivider,
+                thickness = 1.dp
+            )
+
+            // 输出部分
+            Column {
                 Text(
-                    "Base64 Encode :",
-                    fontSize = 14.sp,
-                    modifier = Modifier.fillMaxWidth().padding(2.dp, 0.dp, 0.dp, 10.dp),
-                    textAlign = TextAlign.Start,
+                    StringResources.RESULT,
+                    fontSize = 16.sp,
+                    fontWeight = FontWeight.Medium,
+                    modifier = Modifier.padding(bottom = 8.dp)
                 )
                 BasicTextField(
-                    modifier = Modifier.weight(1f)
+                    modifier = Modifier
                         .fillMaxWidth()
-                        .background(Color.White, RoundedCornerShape(RoundedCorner))
-                        .border(
-                            DimenDivider,
-                            color = ColorDivider,
-                            shape = RoundedCornerShape(RoundedCorner)
-                        )
-                        .padding(10.dp),
-                    value = encodeText,
+                        .background(Color.LightGray.copy(alpha = 0.1f), RoundedCornerShape(8.dp))
+                        .padding(12.dp)
+                        .height(100.dp),
+                    value = outputText,
                     onValueChange = {
-                        encodeText = it
-                    })
-                Row(
-                    modifier = Modifier.fillMaxWidth(1f).padding(top = 5.dp),
-                    horizontalArrangement = Arrangement.End
-                ) {
-                    ThemeButton(
-                        onClick = {
-                            if (encodeText.isNotEmpty()) {
-                                try {
-                                    encodeText = Base64Util.base64Encode(encodeText)
-                                } catch (e: Exception) {
-                                    println(e.message)
-                                }
-                            }
-                        }, "Encode"
-                    )
-                }
-                Text(
-                    "Base64 Decode :",
-                    fontSize = 14.sp,
-                    modifier = Modifier.fillMaxWidth().padding(2.dp, 0.dp, 0.dp, 10.dp),
-                    textAlign = TextAlign.Start,
+                        outputText = it
+                    },
+                    readOnly = true
                 )
-                BasicTextField(
-                    modifier = Modifier.weight(1f)
-                        .fillMaxWidth()
-                        .background(Color.White, RoundedCornerShape(RoundedCorner))
-                        .border(
-                            DimenDivider,
-                            color = ColorDivider,
-                            shape = RoundedCornerShape(RoundedCorner)
-                        )
-                        .padding(10.dp),
-                    value = decodeText,
-                    onValueChange = {
-                        decodeText = it
-                    })
-                Row(
-                    modifier = Modifier.fillMaxWidth(1f).padding(top = 5.dp),
-                    horizontalArrangement = Arrangement.End
-                ) {
-                    ThemeButton(
-                        onClick = {
-                            if (decodeText.isNotEmpty()) {
-                                try {
-                                    decodeText = Base64Util.base64Decode(encodeText).toString()
-                                } catch (e: Exception) {
-                                    println(e.message)
-                                }
-                            }
-                        }, "Decode"
-                    )
-                }
             }
         }
     }

@@ -103,7 +103,12 @@ fun SecondaryThemeButton(onClick: () -> Unit, text: String, enable: Boolean = tr
 
 
 @Composable
-fun ThemeButton(onClick: () -> Unit, text: String, enable: Boolean = true) {
+fun ThemeButton(
+    onClick: () -> Unit,
+    text: String,
+    enable: Boolean = true,
+    modifier: Modifier = Modifier
+) {
     Button(
         elevation = ButtonDefaults.elevation(
             defaultElevation = 0.dp,
@@ -118,6 +123,7 @@ fun ThemeButton(onClick: () -> Unit, text: String, enable: Boolean = true) {
             ColorTheme,
             contentColor = Color.White,
         ),
+        modifier = modifier,
         onClick = {
             onClick.invoke()
         }) {

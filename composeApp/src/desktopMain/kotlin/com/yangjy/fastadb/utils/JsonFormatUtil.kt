@@ -20,13 +20,8 @@ class JsonFormatUtil {
         }
 
         fun format(json: String): String {
-            try {
-                val ob = format.decodeFromString<JsonElement>(json)
-                return format.encodeToString(ob)
-            } catch (e: Exception) {
-                println("json format error:$e")
-            }
-            return ""
+            val ob = format.decodeFromString<JsonElement>(json)
+            return format.encodeToString(ob)
         }
 
         fun parseShortcutGroups(json: String): List<AdbShortcutGroupModel> {

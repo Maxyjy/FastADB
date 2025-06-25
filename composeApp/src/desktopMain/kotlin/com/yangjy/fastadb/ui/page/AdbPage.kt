@@ -64,6 +64,7 @@ import androidx.compose.ui.text.style.TextOverflow
 import com.yangjy.fastadb.constant.AdbCommandData
 import com.yangjy.fastadb.constant.AdbCommands
 import com.yangjy.fastadb.constant.PlaceHolders
+import com.yangjy.fastadb.constant.StringResources
 import com.yangjy.fastadb.model.AdbShortcutGroupModel
 import com.yangjy.fastadb.model.AdbShortcutModel
 import com.yangjy.fastadb.ui.ColorDivider
@@ -122,7 +123,7 @@ fun AdbPage(lifecycleOwner: LifecycleOwner = LocalLifecycleOwner.current) {
     var toastMessage by remember { mutableStateOf("") }
 
     val launcher = rememberDirectoryPickerLauncher(
-        title = "Pick Android Home Path",
+        title = StringResources.PICK_ADB_PATH,
     ) { directory ->
         CoroutineScope(Dispatchers.Default).launch {
             println(directory?.path)
@@ -231,7 +232,11 @@ fun AdbPage(lifecycleOwner: LifecycleOwner = LocalLifecycleOwner.current) {
             AdbCommands.ADB_DEVICE_BRAND,
             object : CommandExecuteCallback {
                 override fun onInputPrint(line: String) {
-                    deviceBrand = line.trim()
+                    deviceBrand = if (line.contains("no devices")) {
+                        StringResources.NO_CONNECT_DEVICE
+                    } else {
+                        line.trim()
+                    }
                 }
 
                 override fun onErrorPrint(line: String) {
@@ -244,11 +249,15 @@ fun AdbPage(lifecycleOwner: LifecycleOwner = LocalLifecycleOwner.current) {
             AdbCommands.ADB_DEVICE_NAME,
             object : CommandExecuteCallback {
                 override fun onInputPrint(line: String) {
-                    deviceName = line.trim()
+                    deviceName = if (line.contains("no devices")) {
+                        ""
+                    } else {
+                        line.trim()
+                    }
                 }
 
                 override fun onErrorPrint(line: String) {
-                    deviceName = "No Connected Device"
+                    deviceName = StringResources.NO_CONNECT_DEVICE
                 }
             })
 
@@ -300,7 +309,7 @@ fun AdbPage(lifecycleOwner: LifecycleOwner = LocalLifecycleOwner.current) {
                             ADB_CONFIGURATION, JsonFormatUtil.formatShortcutGroups(shortcutGroups)
                         )
                         showToast = true
-                        toastMessage = "Default ADB Commands loaded"
+                        toastMessage = StringResources.DEFAULT_ADB_CONFIG_LOADED
                     }
 
                     androidHomePath = SettingsDelegate.getString(ANDROID_HOME_PATH)
@@ -319,8 +328,7 @@ fun AdbPage(lifecycleOwner: LifecycleOwner = LocalLifecycleOwner.current) {
                                             SettingsDelegate.getString(ANDROID_HOME_PATH)
                                         fetchDeviceInfo()
                                         dialogState = false
-                                        toastMessage =
-                                            "ADB path has been set automatically, It also can be manually modified in Settings."
+                                        toastMessage = StringResources.ADB_PATH_SET_AUTOMATICALLY
                                         showToast = true
                                     }
                                 }
@@ -367,7 +375,7 @@ fun AdbPage(lifecycleOwner: LifecycleOwner = LocalLifecycleOwner.current) {
                         fontSize = 18.sp,
                         modifier = Modifier.fillMaxWidth().padding(0.dp, 5.dp, 0.dp, 5.dp),
                         textAlign = TextAlign.Start,
-                        text = "Adb Tool Path Require",
+                        text = StringResources.ADB_TOOL_PATH_REQUIRE,
                         lineHeight = 18.sp,
                         color = ColorText,
                         fontWeight = FontWeight(600)
@@ -377,7 +385,7 @@ fun AdbPage(lifecycleOwner: LifecycleOwner = LocalLifecycleOwner.current) {
                         fontSize = 14.sp,
                         textAlign = TextAlign.Start,
                         lineHeight = 22.sp,
-                        text = "adb tools require locate android home path of system environment",
+                        text = StringResources.ADB_TOOLS_REQUIRE_MESSAGE,
                         color = ColorText
                     )
 
@@ -440,7 +448,7 @@ fun AdbPage(lifecycleOwner: LifecycleOwner = LocalLifecycleOwner.current) {
                         ),
                         fontSize = 12.sp,
                         textAlign = TextAlign.Center,
-                        text = "e.g. /Users/max/Library/Android/sdk/platform-tools",
+                        text = StringResources.ADB_EXAMPLE_PATH,
                         color = ColorTextGrayHint
                     )
                     Text(
@@ -449,7 +457,7 @@ fun AdbPage(lifecycleOwner: LifecycleOwner = LocalLifecycleOwner.current) {
                         ),
                         fontSize = 12.sp,
                         textAlign = TextAlign.Center,
-                        text = "Make sure there is 'adb' under your path",
+                        text = StringResources.MAKE_SURE_ADB_UNDER_PATH,
                         color = ColorTextGrayHint
                     )
                     Row(
@@ -475,7 +483,7 @@ fun AdbPage(lifecycleOwner: LifecycleOwner = LocalLifecycleOwner.current) {
 
     Column(Modifier.fillMaxWidth(), horizontalAlignment = Alignment.CenterHorizontally) {
         Text(
-            "Android Command Executor",
+            StringResources.ANDROID_COMMAND_EXECUTOR,
             fontSize = 30.sp,
             maxLines = 1,
             overflow = TextOverflow.Ellipsis,
@@ -574,7 +582,9 @@ fun AdbPage(lifecycleOwner: LifecycleOwner = LocalLifecycleOwner.current) {
                                 Box {
                                     if (customCommand.isEmpty()) {
                                         Text(
-                                            "Input ADB Command..",
+                                            StringResources.INPUT_ADB_COMMAND,
+                                            maxLines = 1,
+                                            overflow = TextOverflow.Ellipsis,
                                             style = TextStyle(
                                                 fontSize = 12.sp,
                                                 lineHeight = 12.sp,
@@ -615,7 +625,7 @@ fun AdbPage(lifecycleOwner: LifecycleOwner = LocalLifecycleOwner.current) {
                         lineHeight = 12.sp,
                         modifier = Modifier.fillMaxWidth().padding(bottom = 5.dp),
                         textAlign = TextAlign.Start,
-                        text = "App Package Name :",
+                        text = StringResources.APP_PACKAGE_NAME,
                         fontWeight = FontWeight(600),
                         color = if (packageNameInputHint) {
                             ColorTheme
