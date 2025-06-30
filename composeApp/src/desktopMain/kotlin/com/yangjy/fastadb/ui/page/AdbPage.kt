@@ -65,6 +65,7 @@ import com.yangjy.fastadb.constant.AdbCommandData
 import com.yangjy.fastadb.constant.AdbCommands
 import com.yangjy.fastadb.constant.PlaceHolders
 import com.yangjy.fastadb.constant.StringResources
+import com.yangjy.fastadb.getSystemName
 import com.yangjy.fastadb.model.AdbShortcutGroupModel
 import com.yangjy.fastadb.model.AdbShortcutModel
 import com.yangjy.fastadb.ui.ColorDivider
@@ -173,7 +174,7 @@ fun AdbPage(lifecycleOwner: LifecycleOwner = LocalLifecycleOwner.current) {
                             val file = FileKit.pickFile(title = "Pick File")
                             file?.path?.let { path ->
                                 if (path.isNotEmpty() && path != "null") {
-                                    cmd.replace(PlaceHolders.FILE_PATH_HOLDER, "'$path'")
+                                    cmd.replace(PlaceHolders.FILE_PATH_HOLDER, "\'$path\'")
                                 } else {
                                     null
                                 }
@@ -200,7 +201,7 @@ fun AdbPage(lifecycleOwner: LifecycleOwner = LocalLifecycleOwner.current) {
                     file?.path?.let { path ->
                         if (path.isNotEmpty() && path != "null") {
                             val cmd: String = shortCutModel.commandLine.replace(
-                                PlaceHolders.FILE_PATH_HOLDER, path
+                                PlaceHolders.FILE_PATH_HOLDER, "\'$path\'"
                             )
                             executeCustomCommand(cmd)
                         }
@@ -317,27 +318,32 @@ fun AdbPage(lifecycleOwner: LifecycleOwner = LocalLifecycleOwner.current) {
                         dialogState = false
                         fetchDeviceInfo()
                     } else {
-                        CoroutineScope(Dispatchers.Default).launch {
-                            var adbPathFound = false
-                            ADBPathFinder.findADBPath { adbPath ->
-                                if (adbPath.isNotEmpty()) {
-                                    CoroutineScope(Dispatchers.Main).launch {
-                                        adbPathFound = true
-                                        SettingsDelegate.putString(ANDROID_HOME_PATH, adbPath)
-                                        androidHomePath =
-                                            SettingsDelegate.getString(ANDROID_HOME_PATH)
-                                        fetchDeviceInfo()
-                                        dialogState = false
-                                        toastMessage = StringResources.ADB_PATH_SET_AUTOMATICALLY
-                                        showToast = true
+                        if (getSystemName().contains("Win")) {
+                            CoroutineScope(Dispatchers.Default).launch {
+                                var adbPathFound = false
+                                ADBPathFinder.findADBPath { adbPath ->
+                                    if (adbPath.isNotEmpty()) {
+                                        CoroutineScope(Dispatchers.Main).launch {
+                                            adbPathFound = true
+                                            SettingsDelegate.putString(ANDROID_HOME_PATH, adbPath)
+                                            androidHomePath =
+                                                SettingsDelegate.getString(ANDROID_HOME_PATH)
+                                            fetchDeviceInfo()
+                                            dialogState = false
+                                            toastMessage =
+                                                StringResources.ADB_PATH_SET_AUTOMATICALLY
+                                            showToast = true
+                                        }
                                     }
                                 }
+                                delay(2000L)
+                                if (!adbPathFound) {
+                                    dialogState = true
+                                    androidHomePath = ""
+                                }
                             }
-                            delay(2000L)
-                            if (!adbPathFound) {
-                                dialogState = true
-                                androidHomePath = ""
-                            }
+                        } else {
+                            dialogState = true
                         }
                     }
                 }
