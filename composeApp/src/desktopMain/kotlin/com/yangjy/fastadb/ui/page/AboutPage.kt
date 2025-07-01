@@ -44,7 +44,7 @@ fun AboutPage() {
                 modifier = Modifier.padding(0.dp, 0.dp, 0.dp, 30.dp)
             )
             Text(
-                text = "Fast ADB 1.4.1",
+                text = "Fast ADB 1.4.2",
                 fontStyle = androidx.compose.ui.text.font.FontStyle.Normal,
                 fontSize = 24.sp,
                 lineHeight = 14.sp,
