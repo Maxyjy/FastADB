@@ -26,6 +26,7 @@ val ColorTextGrayHint = Color(0xCC6B6B6B)
 val ColorEditable = Color(0xCC000000)
 val ColorEditablePressed = Color(0xCC949494)
 val ColorMoveUpDownIcon = Color(0xCCDEDEDE)
+val ColorLinkText = Color(0xFF2196F3)
 
 // 新增颜色定义
 val ColorPrimary = Color(0xFF2196F3)

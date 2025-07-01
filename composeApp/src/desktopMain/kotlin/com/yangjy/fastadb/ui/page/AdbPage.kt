@@ -70,6 +70,7 @@ import com.yangjy.fastadb.model.AdbShortcutGroupModel
 import com.yangjy.fastadb.model.AdbShortcutModel
 import com.yangjy.fastadb.ui.ColorDivider
 import com.yangjy.fastadb.ui.ColorGray
+import com.yangjy.fastadb.ui.ColorLinkText
 import com.yangjy.fastadb.ui.ColorText
 import com.yangjy.fastadb.ui.ColorTextGrayHint
 import com.yangjy.fastadb.ui.ColorTheme
@@ -87,6 +88,8 @@ import fastadb.composeapp.generated.resources.icon_send
 import io.github.vinceglb.filekit.core.FileKit
 import io.github.vinceglb.filekit.core.pickFile
 import kotlinx.coroutines.delay
+import java.awt.Desktop
+import java.net.URI
 import java.util.Timer
 import java.util.TimerTask
 
@@ -466,11 +469,49 @@ fun AdbPage(lifecycleOwner: LifecycleOwner = LocalLifecycleOwner.current) {
                         text = StringResources.MAKE_SURE_ADB_UNDER_PATH,
                         color = ColorTextGrayHint
                     )
+                    Column() {
+                        Text(
+                            modifier = Modifier.padding(
+                                top = 5.dp, bottom = 0.dp, start = 10.dp, end = 10.dp
+                            ),
+                            fontSize = 12.sp,
+                            textAlign = TextAlign.Center,
+                            text = StringResources.DOWNLOAD_ADB,
+                            color = ColorTextGrayHint
+                        )
+
+                        Text(
+                            modifier = Modifier.padding(
+                                top = 0.dp, bottom = 10.dp, start = 10.dp, end = 10.dp
+                            ).clickable {
+                                val uri = URI(
+                                    if (getSystemName().contains("mac", true)) {
+                                        StringResources.MAC_ADB_URL
+                                    } else if (getSystemName().contains("linux", true)) {
+                                        StringResources.LINUX_ADB_URL
+                                    } else {
+                                        StringResources.WIN_ADB_URL
+                                    }
+                                )
+                                Desktop.getDesktop().browse(uri)
+                            },
+                            fontSize = 12.sp,
+                            textAlign = TextAlign.Center,
+                            text = if (getSystemName().contains("mac", true)) {
+                                StringResources.MAC_ADB_URL
+                            } else if (getSystemName().contains("linux", true)) {
+                                StringResources.LINUX_ADB_URL
+                            } else {
+                                StringResources.WIN_ADB_URL
+                            },
+                            color = ColorLinkText
+                        )
+                    }
                     Row(
                         modifier = Modifier.fillMaxWidth().padding(top = 10.dp),
                         horizontalArrangement = Arrangement.End
                     ) {
-                        ThemeButton(onClick = { dialogState = false }, "Not Now")
+                        ThemeButton(onClick = { dialogState = false }, StringResources.NOT_NOW)
                         Spacer(modifier = Modifier.width(15.dp))
                         ThemeButton(onClick = {
                             if (androidHomePath.isNotEmpty()) {
@@ -480,7 +521,7 @@ fun AdbPage(lifecycleOwner: LifecycleOwner = LocalLifecycleOwner.current) {
                                     fetchDeviceInfo()
                                 }
                             }
-                        }, "Confirm")
+                        }, StringResources.CONFIRM)
                     }
                 }
             }

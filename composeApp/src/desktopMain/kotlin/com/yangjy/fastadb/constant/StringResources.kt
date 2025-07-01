@@ -184,6 +184,16 @@ object StringResources {
             Language.CHINESE -> "确保您的路径下有 \'adb\' 文件"
         }
 
+    val MAC_ADB_URL = "https://dl.google.com/android/repository/platform-tools-latest-darwin.zip"
+    val WIN_ADB_URL = "https://dl.google.com/android/repository/platform-tools-latest-windows.zip"
+    val LINUX_ADB_URL = "https://dl.google.com/android/repository/platform-tools-latest-linux.zip"
+
+    val DOWNLOAD_ADB: String
+        get() = when (currentLanguage) {
+            Language.ENGLISH -> "If you don't have ADB on your computer, you can download here :"
+            Language.CHINESE -> "如果您没有安装ADB，可在此处下载 :"
+        }
+
     val NOT_NOW: String
         get() = when (currentLanguage) {
             Language.ENGLISH -> "Not Now"
