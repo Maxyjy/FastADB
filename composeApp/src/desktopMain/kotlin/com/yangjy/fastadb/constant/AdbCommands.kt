@@ -104,8 +104,8 @@ object AdbCommands {
     const val ADB_DELETE_FILE = "adb shell rm $ADB_FILE_PATH_HOLDER"
     const val ADB_DELETE_DIR = "adb shell rm -rf $ADB_FILE_PATH_HOLDER"
 
-    const val ADB_PULL = "adb pull $ADB_FILE_PATH_HOLDER '$FILE_PATH_HOLDER'"
-    const val ADB_PUSH = "adb push '$FILE_PATH_HOLDER' $ADB_FILE_PATH_HOLDER"
+    const val ADB_PULL = "adb pull '$ADB_FILE_PATH_HOLDER' '$FILE_PATH_HOLDER'"
+    const val ADB_PUSH = "adb push '$FILE_PATH_HOLDER' '$ADB_FILE_PATH_HOLDER'"
 
     const val ADB_MV = "adb shell mv '$ADB_FILE_PATH_HOLDER' '$ADB_FILE_NEW_PATH_HOLDER'"
 }
