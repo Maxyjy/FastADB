@@ -7,9 +7,9 @@ Fast ADB 是一款专为 Android 开发者和测试人员打造的工具应用�
 告别手动输入繁琐命令，快速执行常用 ADB 操作，提高开发与调试效率，使用 Android 设备文件管理系统，便捷操作设备文件。
 
 ## 下载:
-MacOS :&nbsp;&nbsp;&nbsp;[Fast.ADB-1.4.2.dmg](https://github.com/Maxyjy/FastADB/releases/download/v1.4.2/Fast.ADB-1.4.2.dmg)
+MacOS :&nbsp;&nbsp;&nbsp;[Fast.ADB-1.4.2.dmg](https://github.com/Maxyjy/FastADB/releases/download/v1.4.2/Fast.ADB-1.4.2_MacOS.dmg)
 
-Windows : [Fast.ADB_1.4.2.zip](https://github.com/Maxyjy/FastADB/releases/download/v1.4.2/Fast.ADB_1.4.2.zip)
+Windows : [Fast.ADB_1.4.2.zip](https://github.com/Maxyjy/FastADB/releases/download/v1.4.2/Fast.ADB-1.4.2_Windows.zip)
 
 ## 功能：
 🚀 一键执行 ADB 命令：无需记忆和手动输入命令，点击即可执行。

@@ -7,8 +7,8 @@ Say goodbye to manually typing complex commands! This tool lets you execute freq
 Now it also supports Android device file management, ADB auto-setup, and development helper tools.
 
 ## Download:
-MacOS :   [Fast.ADB-1.4.2.dmg](https://github.com/Maxyjy/FastADB/releases/download/v1.4.2/Fast.ADB-1.4.2.dmg)  
-Windows : [Fast.ADB_1.4.2.zip](https://github.com/Maxyjy/FastADB/releases/download/v1.4.2/Fast.ADB_1.4.2.zip)
+MacOS :   [Fast.ADB-1.4.2.dmg](https://github.com/Maxyjy/FastADB/releases/download/v1.4.2/Fast.ADB-1.4.2_MacOS.dmg)  
+Windows : [Fast.ADB_1.4.2.zip](https://github.com/Maxyjy/FastADB/releases/download/v1.4.2/Fast.ADB-1.4.2_Windows.zip)
 
 ## Features:
 🚀 **One-click ADB execution**: No need to remember or type ADB commands manually, just click one button to run.
