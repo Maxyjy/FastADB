@@ -88,7 +88,7 @@ object AdbFileManager {
         CoroutineScope(Dispatchers.Default).launch {
             // 使用adb pull命令将文件从设备复制到指定的本地路径
             val command = ADB_PULL
-                .replace(PlaceHolders.ADB_FILE_PATH_HOLDER, processPath(file.path))
+                .replace(PlaceHolders.ADB_FILE_PATH_HOLDER, file.path)
                 .replace(PlaceHolders.FILE_PATH_HOLDER, localPath)
 
             CommandExecutor.executeADB(
