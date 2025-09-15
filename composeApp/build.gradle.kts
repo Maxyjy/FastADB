@@ -48,8 +48,8 @@ compose.desktop {
         nativeDistributions {
             targetFormats(TargetFormat.Dmg, TargetFormat.Msi, TargetFormat.Deb)
             packageName = "Fast ADB"
-            version = 142
-            packageVersion = "1.4.2"
+            version = 143
+            packageVersion = "1.4.3"
             description = "Fast ADB"
             macOS {
                 dockName = "Fast ADB"
@@ -58,7 +58,6 @@ compose.desktop {
             windows{
                 iconFile.set(project.file("src/commonMain/composeResources/files/AppIcon.ico"))
             }
-
         }
     }
 }
