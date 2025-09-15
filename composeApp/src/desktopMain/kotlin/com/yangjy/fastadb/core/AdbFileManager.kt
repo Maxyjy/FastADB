@@ -220,16 +220,6 @@ object AdbFileManager {
                     symbolLink
                 )
 
-            // 格式化日期
-            val date = try {
-                val timeInSeconds = timestamp.toLong()
-                val date = java.util.Date(timeInSeconds * 1000)
-                val formatter = java.text.SimpleDateFormat("yyyy-MM-dd HH:mm:ss")
-                formatter.format(date)
-            } catch (e: Exception) {
-                timestamp
-            }
-
             // 选择图标
             val icon = when {
                 isDirectory -> Res.drawable.icon_folder
@@ -248,7 +238,7 @@ object AdbFileManager {
                 isDirectory = isDirectory,
                 fileName = fileName,
                 size = size,
-                date = date,
+                timeStamp = timestamp.toLong(),
                 icon = icon,
                 symbolLink = symbolLink,
                 permissions = permissions

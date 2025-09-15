@@ -13,6 +13,7 @@ import androidx.compose.foundation.interaction.collectIsHoveredAsState
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxHeight
@@ -22,13 +23,17 @@ import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
+import androidx.compose.foundation.layout.wrapContentHeight
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.foundation.text.BasicTextField
+import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.material.CircularProgressIndicator
 import androidx.compose.material.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.DisposableEffect
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
@@ -59,6 +64,13 @@ import com.yangjy.fastadb.core.SaveAsListener
 import com.yangjy.fastadb.core.UploadListener
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.ColorFilter
+import androidx.compose.ui.input.key.Key
+import androidx.compose.ui.input.key.KeyEventType
+import androidx.compose.ui.input.key.key
+import androidx.compose.ui.input.key.onKeyEvent
+import androidx.compose.ui.input.key.type
+import androidx.compose.ui.text.TextStyle
+import androidx.compose.ui.text.font.FontStyle
 import com.yangjy.fastadb.model.AdbFileModel
 import com.yangjy.fastadb.ui.ColorDivider
 import com.yangjy.fastadb.ui.ColorText
@@ -94,6 +106,13 @@ import java.io.File
 import com.yangjy.fastadb.core.RenameListener
 import androidx.compose.ui.window.Dialog
 import com.yangjy.fastadb.constant.StringResources
+import com.yangjy.fastadb.model.getFormattedDate
+import fastadb.composeapp.generated.resources.icon_search
+import fastadb.composeapp.generated.resources.icon_send
+import fastadb.composeapp.generated.resources.icon_sort_ascending
+import fastadb.composeapp.generated.resources.icon_sort_by_alpha
+import fastadb.composeapp.generated.resources.icon_sort_by_time
+import fastadb.composeapp.generated.resources.icon_sort_descending
 
 /**
  * Adb File Manager Page
@@ -114,6 +133,13 @@ fun AdbFileManagerPage(lifecycleOwner: LifecycleOwner = LocalLifecycleOwner.curr
     var isLoading by remember { mutableStateOf(false) }
     var loadingMessage by remember { mutableStateOf("") }
 
+    // 搜索文件名称
+    var searchFileName by remember { mutableStateOf("") }
+
+    // 排序状态和排序是否是正序
+    var sortByAlpha by remember { mutableStateOf(Pair<Boolean, Boolean>(true, true)) }
+    var sortByTime by remember { mutableStateOf(Pair<Boolean, Boolean>(false, false)) }
+
     // 重命名对话框状态
     var showRenameDialog by remember { mutableStateOf(false) }
     var renameFileName by remember { mutableStateOf("") }
@@ -131,14 +157,41 @@ fun AdbFileManagerPage(lifecycleOwner: LifecycleOwner = LocalLifecycleOwner.curr
                 isDirectory = true,
                 fileName = ".",
                 size = "",
-                date = "",
+                timeStamp = 0L,
                 icon = Res.drawable.icon_apk,
                 symbolLink = "",
                 permissions = ""
             )
         )
     }
+
     var currentListFiles by remember { mutableStateOf(ArrayList<AdbFileModel>()) }
+
+    LaunchedEffect(sortByTime.first, sortByTime.second) {
+        if (sortByTime.first) {
+            // 创建新的排序后的列表来触发状态更新
+            val sortedList = if (sortByTime.second) {
+                currentListFiles.sortedBy { it.timeStamp }
+            } else {
+                currentListFiles.sortedByDescending { it.timeStamp }
+            }
+            currentListFiles = ArrayList<AdbFileModel>()
+            currentListFiles.addAll(sortedList)
+        }
+    }
+
+    LaunchedEffect(sortByAlpha.first, sortByAlpha.second) {
+        if (sortByAlpha.first) {
+            // 创建新的排序后的列表来触发状态更新
+            val sortedList = if (sortByAlpha.second) {
+                currentListFiles.sortedBy { it.fileName.lowercase() }
+            } else {
+                currentListFiles.sortedByDescending { it.fileName.lowercase() }
+            }
+            currentListFiles = ArrayList<AdbFileModel>()
+            currentListFiles.addAll(sortedList)
+        }
+    }
 
     fun findChildList() {
         println("find child list ${currentRoot.path}")
@@ -343,7 +396,7 @@ fun AdbFileManagerPage(lifecycleOwner: LifecycleOwner = LocalLifecycleOwner.curr
                                             fileName = parentPath.substringAfterLast("/")
                                                 .takeIf { it.isNotEmpty() } ?: ".",
                                             size = "",
-                                            date = "",
+                                            timeStamp = 0L,
                                             icon = Res.drawable.icon_folder,
                                             symbolLink = "",
                                             permissions = ""
@@ -423,23 +476,197 @@ fun AdbFileManagerPage(lifecycleOwner: LifecycleOwner = LocalLifecycleOwner.curr
 
                         }
 
+
                         // 添加间距
                         Spacer(modifier = Modifier.height(12.dp))
+
+                        Row(
+                            modifier = Modifier.fillMaxWidth().wrapContentHeight().padding(
+                                paddingValues = PaddingValues(
+                                    top = 12.dp, bottom = 12.dp, start = 10.dp, end = 10.dp
+                                )
+                            ), verticalAlignment = Alignment.CenterVertically
+                        ) {
+                            Image(
+                                painter = painterResource(Res.drawable.icon_search),
+                                StringResources.SEARCH_BY_NAME,
+                                modifier = Modifier.height(24.dp).width(24.dp),
+                            )
+                            BasicTextField(
+                                value = searchFileName,
+                                textStyle = TextStyle(
+                                    fontSize = 14.sp,
+                                    lineHeight = 14.sp,
+                                    fontWeight = FontWeight(500),
+                                    fontStyle = FontStyle.Normal,
+                                ),
+                                modifier = Modifier.weight(1f).padding(start = 10.dp),
+                                onValueChange = {
+                                    searchFileName = it
+                                },
+                                singleLine = true,
+                                keyboardOptions = KeyboardOptions(imeAction = androidx.compose.ui.text.input.ImeAction.Done),
+                                decorationBox = { innerTextField ->
+                                    Box {
+                                        if (searchFileName.isEmpty()) {
+                                            Text(
+                                                StringResources.SEARCH_BY_NAME,
+                                                maxLines = 1,
+                                                overflow = TextOverflow.Ellipsis,
+                                                style = TextStyle(
+                                                    fontSize = 12.sp,
+                                                    lineHeight = 12.sp,
+                                                    color = ColorTextGrayHint
+                                                )
+                                            )
+                                        }
+                                        innerTextField()
+                                    }
+                                },
+                            )
+                            Row(
+                                verticalAlignment = Alignment.CenterVertically,
+                                modifier = Modifier.padding(end = 10.dp).clickable {
+                                    sortByTime = Pair(true, !sortByTime.second)
+                                    // 重置字母排序状态
+                                    sortByAlpha = Pair(false, false)
+                                }.padding(horizontal = 5.dp, vertical = 5.dp)
+                            ) {
+                                Image(
+                                    painter = painterResource(Res.drawable.icon_sort_by_time),
+                                    "sort by time",
+                                    modifier = Modifier.height(14.dp).width(14.dp),
+                                    colorFilter = ColorFilter.tint(
+                                        if (sortByTime.first) {
+                                            ColorTheme
+                                        } else {
+                                            ColorEditable
+                                        }
+                                    )
+                                )
+                                Text(
+                                    textAlign = TextAlign.Start,
+                                    text = if (sortByTime.first) {
+                                        if (sortByTime.second) {
+                                            StringResources.TIME_ASCENDING
+                                        } else {
+                                            StringResources.TIME_DESCENDING
+                                        }
+                                    } else {
+                                        StringResources.SORT_BY_TIME
+                                    },
+                                    lineHeight = 11.sp,
+                                    fontSize = 11.sp,
+                                    fontWeight = FontWeight.Medium,
+                                    color = if (sortByTime.first) {
+                                        ColorTheme
+                                    } else {
+                                        ColorEditable
+                                    },
+                                    modifier = Modifier.padding(
+                                        start = 4.dp,
+                                        end = 2.dp,
+                                    )
+                                )
+                                Image(
+                                    painter = painterResource(
+                                        if (sortByTime.second) {
+                                            Res.drawable.icon_sort_ascending
+                                        } else {
+                                            Res.drawable.icon_sort_descending
+                                        }
+                                    ),
+                                    "sort by time",
+                                    modifier = Modifier.height(12.dp).width(12.dp).alpha(
+                                        alpha = if (sortByTime.first) {
+                                            1f
+                                        } else {
+                                            0f
+                                        }
+                                    ),
+                                )
+                            }
+
+                            Row(
+                                verticalAlignment = Alignment.CenterVertically,
+                                modifier = Modifier.padding(end = 10.dp).clickable {
+                                    sortByAlpha = Pair(true, !sortByAlpha.second)
+                                    // 重置时间排序状态
+                                    sortByTime = Pair(false, false)
+                                }.padding(horizontal = 5.dp, vertical = 5.dp)
+                            ) {
+                                Image(
+                                    painter = painterResource(Res.drawable.icon_sort_by_alpha),
+                                    "sort by name",
+                                    modifier = Modifier.height(14.dp).width(14.dp),
+                                    colorFilter = ColorFilter.tint(
+                                        if (sortByAlpha.first) {
+                                            ColorTheme
+                                        } else {
+                                            ColorEditable
+                                        }
+                                    )
+                                )
+                                Text(
+                                    textAlign = TextAlign.Start,
+                                    text = if (sortByAlpha.first) {
+                                        if (sortByAlpha.second) {
+                                            StringResources.NAME_ASCENDING
+                                        } else {
+                                            StringResources.NAME_DESCENDING
+                                        }
+                                    } else {
+                                        StringResources.SORT_BY_ALPHA
+                                    },
+                                    lineHeight = 11.sp,
+                                    fontSize = 11.sp,
+                                    fontWeight = FontWeight.Medium,
+                                    color = if (sortByAlpha.first) {
+                                        ColorTheme
+                                    } else {
+                                        ColorEditable
+                                    },
+                                    modifier = Modifier.padding(
+                                        start = 4.dp,
+                                        end = 2.dp,
+                                    )
+                                )
+                                Image(
+                                    painter = painterResource(
+                                        if (sortByAlpha.second) {
+                                            Res.drawable.icon_sort_ascending
+                                        } else {
+                                            Res.drawable.icon_sort_descending
+                                        }
+                                    ),
+                                    "sort by time",
+                                    modifier = Modifier.height(12.dp).width(12.dp).alpha(
+                                        alpha = if (sortByAlpha.first) {
+                                            1f
+                                        } else {
+                                            0f
+                                        },
+                                    ),
+                                )
+                            }
+                        }
+
                         Box(
                             modifier = Modifier.fillMaxWidth().height(DimenDivider).background(
                                 ColorDivider
                             )
                         )
-                        Box(
-                            modifier = Modifier.fillMaxWidth().height(DimenDivider).background(
-                                ColorDivider
-                            )
-                        )
+
                         if (currentRoot.path == "." || currentListFiles.isNotEmpty()) {
                             LazyColumn(
                                 modifier = Modifier.fillMaxWidth()
                             ) {
-                                items(currentListFiles) { file ->
+                                items(currentListFiles.filter {
+                                    it.fileName.contains(
+                                        searchFileName,
+                                        ignoreCase = true
+                                    )
+                                }) { file ->
                                     val interactionSource = remember { MutableInteractionSource() }
                                     val isHovered by interactionSource.collectIsHoveredAsState()
 
@@ -450,6 +677,7 @@ fun AdbFileManagerPage(lifecycleOwner: LifecycleOwner = LocalLifecycleOwner.curr
                                             .clickable {
                                                 println("click: ${file.path}")
                                                 if (file.isDirectory) {
+                                                    searchFileName = ""
                                                     currentRoot = file
                                                     findChildList()
                                                 }
@@ -501,7 +729,7 @@ fun AdbFileManagerPage(lifecycleOwner: LifecycleOwner = LocalLifecycleOwner.curr
                                                 // 文件详情（日期和大小）
                                                 Row(modifier = Modifier.fillMaxWidth(0.9f)) {
                                                     Text(
-                                                        text = file.date,
+                                                        text = file.getFormattedDate(),
                                                         fontSize = 12.sp,
                                                         maxLines = 1,
                                                         overflow = TextOverflow.Ellipsis,

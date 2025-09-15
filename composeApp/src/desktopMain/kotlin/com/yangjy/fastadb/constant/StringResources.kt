@@ -250,6 +250,47 @@ object StringResources {
             Language.CHINESE -> "设备文件管理器"
         }
 
+    val SEARCH_BY_NAME: String
+        get() = when (currentLanguage) {
+            Language.ENGLISH -> "Search file or directory by name.."
+            Language.CHINESE -> "按名称搜索文件或目录.."
+        }
+    val SORT_BY_TIME: String
+        get() = when (currentLanguage) {
+            Language.ENGLISH -> "Sort by time"
+            Language.CHINESE -> "按时间排序"
+        }
+
+    val TIME_ASCENDING: String
+        get() = when (currentLanguage) {
+            Language.ENGLISH -> "Time Ascending"
+            Language.CHINESE -> "按时间升序"
+        }
+
+    val TIME_DESCENDING: String
+        get() = when (currentLanguage) {
+            Language.ENGLISH -> "Time Descending"
+            Language.CHINESE -> "按时间降序"
+        }
+
+    val SORT_BY_ALPHA: String
+        get() = when (currentLanguage) {
+            Language.ENGLISH -> "Sort by name"
+            Language.CHINESE -> "按名称排序"
+        }
+
+    val NAME_ASCENDING: String
+        get() = when (currentLanguage) {
+            Language.ENGLISH -> "Name Ascending"
+            Language.CHINESE -> "按名称升序"
+        }
+
+    val NAME_DESCENDING: String
+        get() = when (currentLanguage) {
+            Language.ENGLISH -> "Name Descending"
+            Language.CHINESE -> "按名称降序"
+        }
+
     val BACK: String
         get() = when (currentLanguage) {
             Language.ENGLISH -> "Back"
