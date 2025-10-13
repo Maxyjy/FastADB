@@ -25,7 +25,16 @@ Windows : [Fast.ADB_1.4.3.zip](https://github.com/Maxyjy/FastADB/releases/downlo
 ## 跨平台支持
 基于 Kotlin MultiPlatform 开发，支持MacOS、Windows、Linux。
 
-（Linux：需自行在Linux系统中构建KMP环境，运行该代码，打包deb来安装，开发者没有Linux设备来进行打包)
+## Mac & Linux 安装事项
+Mac ：安装时如果出现提示：“Apple 无法验证 ‘Fast ADB’ 是否包含可能危害 Mac 安全或泄漏隐私的恶意软件。” 
+
+这是因为我目前没有使用 Apple 开发者证书对应用进行签名(支付不起开发者年费)。
+
+您可以按照以下步骤手动允许运行：
+
+打开 系统设置 → 隐私与安全性 → 找到安全性 → 点击 “仍要打开” → 再次运行应用即可正常使用。
+
+Linux：需自行在Linux系统中构建KMP环境，运行该代码，打包deb来安装，开发者没有Linux设备来进行打包
 
 ## ADB命令执行面板
 <img src="https://github.com/Maxyjy/FastADB/blob/main/screenshot/adb.jpg" alt="Fast ADB" width="800"/>
