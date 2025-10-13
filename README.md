@@ -25,7 +25,22 @@ Windows : [Fast.ADB_1.4.3.zip](https://github.com/Maxyjy/FastADB/releases/downlo
 ## Multi-Platform Support
 Built with Kotlin Multiplatform, Fast ADB runs on macOS, Windows, and Linux.
 
-⚠️ Note for Linux users: You'll need to set up a KMP environment and build the app manually (generate a `.deb`), as the developer currently doesn't have a Linux device to assemble `.deb` packages.
+Mac users : If you see the message during installation: “Apple cannot verify that ‘Fast ADB’ does not contain malware that may harm your Mac or compromise your privacy.”
+This happens because the app is not signed with an Apple Developer certificate(Can't afford the developer membership fee), You can allow it manually with the following steps:
+Open System Settings → Privacy & Security -> Find -> Click “Open Anyway” -> Run the app again
+
+
+## Mac & Linux Installation Notes
+
+Mac users:
+If you see the message: “Apple cannot verify that ‘Fast ADB’ does not contain malware that may harm your Mac or compromise your privacy.”
+
+This occurs because the app is not signed with an Apple Developer certificate (cannot afford the developer membership fee).
+
+You can manually allow the app to run by following these steps:
+Open System Settings → Privacy & Security → Security section → Click “Open Anyway” → Run the app again, and it should work normally.
+
+Linux users: You'll need to set up a KMP environment and build the app manually (generate a `.deb`), as the developer currently doesn't have a Linux device to assemble `.deb` packages.
 
 ## ADB Command Execution Panel
 <img src="https://github.com/Maxyjy/FastADB/blob/main/screenshot/adb.jpg" alt="Fast ADB Logo" width="800"/>
